@@ -103,7 +103,7 @@ def finalize(out):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='dump-converter.py', usage='python3 %(prog)s [options] INPUT > select-queries.sql', description='Linkurious Enterprise User-Data Store dump converter')
-    parser.add_argument('input', action='store', metavar='INPUT', help='the Sqlite dump to convert (a *.sql file)')
+    parser.add_argument('input', action='store', metavar='INPUT', help='the SQLite dump to convert (a *.sql file)')
     parser.add_argument('-o', '--out', dest='output', action='store', default='export-parsed.sql', required=False, help='the output file for the new import instructions (default: export-parsed.sql)')
     parser.add_argument('--dialect', dest='dialect', action='store', choices=['mysql', 'mariadb', 'mssql'], default='mysql', help='the dialect of the destination database (default: mysql)')
 
