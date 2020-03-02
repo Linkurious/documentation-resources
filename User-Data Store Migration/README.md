@@ -10,7 +10,8 @@ Since different databases may use different syntax, this tools is aimed to provi
 
 > /!\ The tool's objective is to migrate data from SQLite to an external database for the same Linkurious Enterprise instance. No other scenarios are covered.
 
-# The migration process
+
+## The migration process
 
 Linkurious Enterprise is designed to create and maintain (through the updates) its data structure over the supported databases.
 
@@ -24,7 +25,8 @@ The tool is designed to help a database administrator generate the correct scrip
 5. list in output all the `select` instructions needed to access all the migrated data, it could be useful for running any query to verify the correctness of the migration.
 
 
-The full list of steps would be:
+## How to use the tool
+
 1. Create a text dump of the current SQLite file with the sqlite3 tool:
    ```shell
    sqlite3 ./linkurious/data/server/database.sqlite .dump > export.sql
@@ -32,7 +34,7 @@ The full list of steps would be:
 2. Put the `export.sql` file in the same directory of the `dump-converter.py` python script
 3. Run the program to generate a new SQL import script (example for MySQL):
    ```shell
-   python3 dump-converter.py --dialect mysql export.sql > select-queries.sql
+   python3 dump-converter.py --dialect mysql -o export-parsed.sql export.sql > select-queries.sql
    ```
 4. The program will generate two files:
    - export-parsed.sql : the new SQL import file to be used instead of the initial one
@@ -48,7 +50,7 @@ The full list of steps would be:
 10. After the import script is executed successfully you can start again Linkurious Enterprise and accessing all the previous data
 
 
-# How to use / customize the tool
+## How to customize the tool
 
 The script is developed to work without any change based on the current known issues at the time of the development. Some parameters are available to configure the destination database or the input / output file, below the extract of the help.
 
