@@ -32,9 +32,19 @@ The tool is designed to help a database administrator generate the correct scrip
    sqlite3 ./linkurious/data/server/database.sqlite .dump > export.sql
    ```
 2. Put the `export.sql` file in the same directory of the `dump-converter.py` python script
-3. Run the program to generate a new SQL import script (example for MySQL):
+3. Run the program to generate a new SQL import script:
+   
+   example for MySQL
    ```shell
    python3 dump-converter.py --dialect mysql -o export-parsed.sql export.sql > select-queries.sql
+   ```
+   example for MariaDB
+   ```shell
+   python3 dump-converter.py --dialect mariadb -o export-parsed.sql export.sql > select-queries.sql
+   ```
+   example for Microsoft SQL Server
+   ```shell
+   python3 dump-converter.py --dialect mssql -o export-parsed.sql export.sql > select-queries.sql
    ```
 4. The program will generate two files:
    - export-parsed.sql : the new SQL import file to be used instead of the initial one
@@ -43,9 +53,19 @@ The tool is designed to help a database administrator generate the correct scrip
 6. Configure Linkurious Enterprise to point the new Database (refer to the correct version of the [documentation](https://doc.linkurio.us) in case of doubts)
 7. Start Linkurious Enterprise
 8. As soon as it starts properly (you can see the application, regardless the connection error to the graph database), stop it.
-9. Run the new script in your system to import data (example for MySQL):
+9. Run the new script in your system to import data:
+   
+   example for MySQL
    ```shell
    mysql -u MY_MYSQL_USER -p -h 127.0.0.1 linkurious < export-parsed.sql
+   ```
+   example for MariaDB
+   ```shell
+   mariadb -u MY_MYSQL_USER -p -h 127.0.0.1 linkurious < export-parsed.sql
+   ```
+   example for Microsoft SQL Server
+   ```shell
+   sqlcmd -U MY_MYSQL_USER -H 127.0.0.1 -d linkurious -i export-parsed.sql
    ```
 10. After the import script is executed successfully you can start again Linkurious Enterprise and accessing all the previous data
 

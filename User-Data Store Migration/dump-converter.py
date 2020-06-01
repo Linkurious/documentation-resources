@@ -31,16 +31,68 @@ def getStructureInfoCreate(match, replace):
     return replace
 
 
+def extractListOfValues(inputStr):
+    values = []
+    if not inputStr:
+        return values
+    
+    value_buffer = ""
+    in_string = False
+    escape_quote = False
+    parentheses_counter = 0
+    for c in inputStr:
+        if escape_quote and c != "'":
+            in_string = False
+            escape_quote = False
+
+        if in_string:
+            if c == "'":
+                escape_quote = not escape_quote
+            
+            value_buffer += c
+        else:
+            if c == "'":
+                if __dialect__ == "mssql":
+                    value_buffer += "N'"
+                else:
+                    value_buffer += "'"
+                
+                in_string = True
+            elif c == "(":
+                parentheses_counter += 1
+                value_buffer += c
+            elif c == ")":
+                parentheses_counter -= 1
+                value_buffer += c
+            elif parentheses_counter > 0 and c == ",":
+                value_buffer += c
+            elif c == ",":
+                values.append(value_buffer.strip())
+                value_buffer = ""
+                
+                assert not in_string, "Error while parsing values list: Unexpected quote. `%s`" % (inputStr)
+                assert not escape_quote, "Error while parsing values list: Unexpected escape quote. `%s`" % (inputStr)
+                continue
+            else:
+                value_buffer += c
+    
+    assert value_buffer != "", "Error while parsing values list: Missing value. `%s`" % (inputStr)
+    values.append(value_buffer.strip())
+    
+    return values
+
+
 def injectStructureInfoInsertInto(match, replace):
     global last_header
 
     statement = match.group(0)
-    match = re.match(r"^INSERT INTO\s*(?:(?P<quote>[\"` ])(?P<name>.*?)(?P=quote)).*", statement)
+    match = re.match(r"^INSERT INTO\s*(?:(?P<quote>[\"` ])(?P<name>.*?)(?P=quote)).*VALUES\s*\((?P<values>.*)\).*$", statement)
     if match:
         last_header = match.group("name")
         headers = table_header.get(last_header, None)
         if headers:
-            statement = ("INSERT INTO " + NAME_TEMPLATE + " (%s) %s") % (last_header, ", ".join(headers), line[line.find("VALUES"):])
+            values = extractListOfValues(match.group("values"))
+            statement = ("INSERT INTO " + NAME_TEMPLATE + " (%s) VALUES(%s);\n") % (last_header, ",".join(headers), ",".join(values))
     
     return statement
 
@@ -69,6 +121,7 @@ def initialize(out):
         NAME_TEMPLATE = "[%s]"
         pre.append("EXEC sp_MSforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT all';")
         post.append("EXEC sp_MSforeachtable 'ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all';")
+        post.append("go")
 
         replace_rules.append(
             (
