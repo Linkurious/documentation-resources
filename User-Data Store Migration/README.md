@@ -36,15 +36,15 @@ The tool is designed to help a database administrator generate the correct scrip
    
    example for MySQL
    ```shell
-   python3 dump-converter.py --dialect mysql -o export-parsed.sql export.sql > select-queries.sql
+   python3 dump-converter.py --dialect mysql -d schema.json -o export-parsed.sql export.sql > select-queries.sql
    ```
    example for MariaDB
    ```shell
-   python3 dump-converter.py --dialect mariadb -o export-parsed.sql export.sql > select-queries.sql
+   python3 dump-converter.py --dialect mariadb -d schema.json -o export-parsed.sql export.sql > select-queries.sql
    ```
    example for Microsoft SQL Server
    ```shell
-   python3 dump-converter.py --dialect mssql -o export-parsed.sql export.sql > select-queries.sql
+   python3 dump-converter.py --dialect mssql -d schema.json -o export-parsed.sql export.sql > select-queries.sql
    ```
 4. The program will generate two files:
    - export-parsed.sql : the new SQL import file to be used instead of the initial one
@@ -67,15 +67,46 @@ The tool is designed to help a database administrator generate the correct scrip
    ```shell
    sqlcmd -U MY_MYSQL_USER -H 127.0.0.1 -d linkurious -i export-parsed.sql
    ```
+
+   > /!\ In case you get errors related to the schema definition, see the section [How to manage schema conflicts](#how-to-handle-schema-conflicts)
+
 10. After the import script is executed successfully you can start again Linkurious Enterprise and accessing all the previous data
+
+
+## How to handle schema conflicts
+Depending on the configuration and the sequence of updates performed in the system,
+it may happen that the old database has a different schema compared to the new fresh installation.
+Main possibility is that the old schema contains some obsolete columns that have not been created in the fresh installation.
+
+To fix this problem, it is possible to execute again the tool with providing the new correct schema.
+1. Following the standard procedure, tanks to the option `-d schema.json`,
+the tool has already generated a `schema.json` file containing the structure identified in the `*.sql` file
+1. Change the file to remove the extra columns based on import failures
+1. Execute again the tool specifying the new schema with option `--schema`
+   
+   example for MySQL
+   ```shell
+   python3 dump-converter.py --dialect mysql --schema schema.json -o export-parsed.sql export.sql > select-queries.sql
+   ```
+   example for MariaDB
+   ```shell
+   python3 dump-converter.py --dialect mariadb --schema schema.json -o export-parsed.sql export.sql > select-queries.sql
+   ```
+   example for Microsoft SQL Server
+   ```shell
+   python3 dump-converter.py --dialect mssql --schema schema.json -o export-parsed.sql export.sql > select-queries.sql
+   ```
+
+Repeat the above steps as many time as required to to fix all the mismatch.
 
 
 ## How to customize the tool
 
-The script is developed to work without any change based on the current known issues at the time of the development. Some parameters are available to configure the destination database or the input / output file, below the extract of the help.
+The script is developed to work without any change based on the current known issues at the time of the development.
+Some parameters are available to configure the destination database or the input / output file, below the extract of the help.
 
 ```shell
-$ python3 dump-converter.py -h
+$ python3 dump-converter.py --help
 usage: python3 dump-converter.py [options] INPUT > select-queries.sql
 
 Linkurious Enterprise User-Data Store dump converter
@@ -88,9 +119,17 @@ optional arguments:
   -o OUTPUT, --out OUTPUT
                         the output file for the new import instructions
                         (default: export-parsed.sql)
+  -d DUMP_SCHEMA, --dump-schema DUMP_SCHEMA
+                        the output file in json format of the schema used to
+                        create the output, compatible with the schema option
+                        (default: not exported)
   --dialect {mysql,mariadb,mssql}
                         the dialect of the destination database (default:
                         mysql)
+  --schema SCHEMA       the file containing the destination schema structure,
+                        it is a *.json file containing the mapping as { "table
+                        name": ["list of columns"] } (default: everything is
+                        created according to the input file)
 ```
 
 However it is possible to quickly modify the tool to change / add conversion rules to adapt it to your needs.
