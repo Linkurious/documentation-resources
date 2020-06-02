@@ -53,15 +53,15 @@ The tool is designed to help a database administrator generate the correct scrip
 6. Configure Linkurious Enterprise to point the new Database (refer to the correct version of the [documentation](https://doc.linkurio.us) in case of doubts)
 7. Start Linkurious Enterprise
 8. As soon as it starts properly (you can see the application, regardless the connection error to the graph database), stop it.
-9. Run the new script in your system to import data:
+9. Run the new script in your system to import data (since the system uses **unicode characters**, be careful to the encoding):
    
    example for MySQL
    ```shell
-   mysql -u MY_MYSQL_USER -p -h 127.0.0.1 linkurious < export-parsed.sql
+   mysql -u MY_MYSQL_USER -p -h 127.0.0.1 --default-character-set=utf8mb4 linkurious < export-parsed.sql
    ```
    example for MariaDB
    ```shell
-   mariadb -u MY_MYSQL_USER -p -h 127.0.0.1 linkurious < export-parsed.sql
+   mariadb -u MY_MYSQL_USER -p -h 127.0.0.1 --default-character-set=utf8mb4 linkurious < export-parsed.sql
    ```
    example for Microsoft SQL Server
    ```shell
