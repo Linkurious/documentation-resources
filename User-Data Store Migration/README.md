@@ -48,9 +48,10 @@ The tool is designed to help a database administrator generate the correct scrip
    ```shell
    python3 dump-converter.py --dialect mssql -d schema.json -o export-parsed.sql export.sql > select-queries.sql
    ```
-4. The program will generate two files:
-   - export-parsed.sql : the new SQL import file to be used instead of the initial one
-   - select-queries.sql : a script containing the `select` queries for all the tables found in the initial script. It can be useful for debugging / crosscheck purposes.
+4. The program will generate three files:
+   - `export-parsed.sql` : the new SQL import file to be used instead of the initial one
+   - `select-queries.sql` : a script containing the `select` queries for all the tables found in the initial script. It can be useful for debugging / crosscheck purposes.
+   - `schema.json` : the schema discovered in the input script, useful to resolve eventual schema conflicts (see later for more details)
 5. Setup your external database server and create an empty database
 6. Configure Linkurious Enterprise to point the new Database (refer to the correct version of the [documentation](https://doc.linkurio.us) in case of doubts)
 7. Start Linkurious Enterprise
@@ -106,13 +107,13 @@ Repeat the above steps as many time as required to to fix all the mismatch.
 In case of migration from MySQL server instead of Sqlite, use the following procedure to create the `export.sql` file.
 
 1. Add the `lke_export` stored procedure provided in the `mysql_export_sp.sql` script
-```shell
-mysql -u MY_MYSQL_USER -p -h 127.0.0.1 -e linkurious < mysql_export_sp.sql
+   ```shell
+   mysql -u MY_MYSQL_USER -p -h 127.0.0.1 -e linkurious < mysql_export_sp.sql
    ```
 1. Execute the store procedure, note the presence of `-NBr` parameters (mandatory to avoid format issues)
    ```shell
    mysql -NBr -u MY_MYSQL_USER -p -h 127.0.0.1 -e "call lke_export" linkurious > export.sql
-```
+   ```
 
 Follow the rest of the standard procedure for Sqlite migration.
 
