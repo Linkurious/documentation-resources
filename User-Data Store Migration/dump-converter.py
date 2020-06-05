@@ -24,7 +24,7 @@ __out_schema__ = None
 def getStructureInfoCreate(match, replace):
     global last_header
 
-    match_iter = re.finditer(r"(?:\(|, )`(?P<name>[^`]+)`(?:[^,\)]+)", match.group(0))
+    match_iter = re.finditer(r"(?:\( *|, *)`(?P<name>[^`]+)`(?:[^,\)]+)", match.group(0))
     in_table_header[match.group(1)] = [x.group("name") for x in match_iter]
 
     if __dialect__ == "mssql":
@@ -56,7 +56,7 @@ def extractListOfValues(inputStr):
 
         if in_string:
             if c == "'":
-                escape_quote = not escape_quote
+                    escape_quote = not escape_quote
             
             value_buffer += c
         else:
@@ -148,7 +148,7 @@ def initialize(out):
         pre.append("SET FOREIGN_KEY_CHECKS=0;")
         post.append("SET FOREIGN_KEY_CHECKS=1;")
         
-        replace_rules.append((True, r"^BEGIN TRANSACTION;[\r\n]*$", "START TRANSACTION;", 0, None, True))
+        replace_rules.append((True, r"^BEGIN TRANSACTION;\s*$", "START TRANSACTION;", 0, None, True))
         replace_rules.append((True, r"^CREATE TABLE `(?P<name>[^`]*)`.*$", ("TRUNCATE TABLE " + NAME_TEMPLATE + ";") % ("{1}"), 1, getStructureInfoCreate, True))
     elif __dialect__ == "mssql":
         NAME_TEMPLATE = "[%s]"
@@ -156,6 +156,7 @@ def initialize(out):
         post.append("EXEC sp_MSforeachtable 'ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all';")
         post.append("go")
 
+        replace_rules.append((True, r"^START TRANSACTION;\s*$", "BEGIN TRANSACTION;", 0, None, True))
         replace_rules.append(
             (
                 True,
@@ -214,7 +215,26 @@ if __name__ == '__main__':
             writeline(dst, pre)
             post_initialize(dst)
 
+            multiline_create_buffer = ""
             for line in src:
+                #
+                # Backup code:
+                # No more need to collapse CREATE statements in a single line
+                #
+                # # Convert any multiline CREATE statement into a single line statement
+                # stripped_line = line.strip() # main objective to remove new line chars
+                # if stripped_line.startswith("CREATE TABLE") and not stripped_line.endswith(");"):
+                #     assert multiline_create_buffer == "", "Error while parsing a Create Statement, unexpected create statement"
+                #     multiline_create_buffer = stripped_line
+                #     continue
+                # elif multiline_create_buffer:
+                #     multiline_create_buffer += " " + stripped_line
+                #     if stripped_line.endswith(");"):
+                #         line = multiline_create_buffer
+                #         multiline_create_buffer = ""
+                #     else:
+                #         continue
+
                 for rule in replace_rules:
                     if rule[0]:
                         match = re.match(rule[1], line)
@@ -257,7 +277,7 @@ if __name__ == '__main__':
         
         try:
             with open(args.dump_schema, "w") as outfile:
-                json.dump(__out_schema__ if __out_schema__ else in_table_header, outfile, indent = 4)
+                json.dump(__out_schema__ if __out_schema__ else in_table_header, outfile, indent = 4, sort_keys = True)
         except:
             ex_type, ex_value, ex_traceback = sys.exc_info()
             sys.stderr.write("Error while exporting the input schema: %s" % str(ex_value))

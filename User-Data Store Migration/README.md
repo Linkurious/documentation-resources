@@ -31,6 +31,8 @@ The tool is designed to help a database administrator generate the correct scrip
    ```shell
    sqlite3 ./linkurious/data/server/database.sqlite .dump > export.sql
    ```
+
+   The tool has been tested to support also migration from MySQL (see the section [How to migrate from MySQL](#how-to-migrate-from-mysql)).
 2. Put the `export.sql` file in the same directory of the `dump-converter.py` python script
 3. Run the program to generate a new SQL import script:
    
@@ -98,6 +100,21 @@ the tool has already generated a `schema.json` file containing the structure ide
    ```
 
 Repeat the above steps as many time as required to to fix all the mismatch.
+
+
+## How to migrate from MySQL
+In case of migration from MySQL server instead of Sqlite, use the following procedure to create the `export.sql` file.
+
+1. Add the `lke_export` stored procedure provided in the `mysql_export_sp.sql` script
+```shell
+mysql -u MY_MYSQL_USER -p -h 127.0.0.1 -e linkurious < mysql_export_sp.sql
+   ```
+1. Execute the store procedure, note the presence of `-NBr` parameters (mandatory to avoid format issues)
+   ```shell
+   mysql -NBr -u MY_MYSQL_USER -p -h 127.0.0.1 -e "call lke_export" linkurious > export.sql
+```
+
+Follow the rest of the standard procedure for Sqlite migration.
 
 
 ## How to customize the tool
