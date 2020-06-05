@@ -67,7 +67,7 @@ The tool is designed to help a database administrator generate the correct scrip
    ```
    example for Microsoft SQL Server
    ```shell
-   sqlcmd -U MY_MYSQL_USER -H 127.0.0.1 -d linkurious -i export-parsed.sql
+   sqlcmd -U MY_MYSQL_USER -S 127.0.0.1 -d linkurious -i export-parsed.sql
    ```
 
    > /!\ In case you get errors related to the schema definition, see the section [How to manage schema conflicts](#how-to-handle-schema-conflicts)

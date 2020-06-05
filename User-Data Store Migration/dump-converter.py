@@ -152,8 +152,9 @@ def initialize(out):
         replace_rules.append((True, r"^CREATE TABLE `(?P<name>[^`]*)`.*$", ("TRUNCATE TABLE " + NAME_TEMPLATE + ";") % ("{1}"), 1, getStructureInfoCreate, True))
     elif __dialect__ == "mssql":
         NAME_TEMPLATE = "[%s]"
-        pre.append("EXEC sp_MSforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT all';")
-        post.append("EXEC sp_MSforeachtable 'ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all';")
+        pre.append("declare @query varchar(max);");
+        pre.append("select @query = coalesce(@query + ' ' + 'ALTER TABLE [' + name + '] NOCHECK CONSTRAINT all;', 'ALTER TABLE [' + name + '] NOCHECK CONSTRAINT all;') from sys.tables; exec(@query);")
+        post.append("select @query = coalesce(@query + ' ' + 'ALTER TABLE [' + name + '] WITH CHECK CHECK CONSTRAINT all;', 'ALTER TABLE [' + name + '] WITH CHECK CHECK CONSTRAINT all;') from sys.tables; exec(@query);")
         post.append("go")
 
         replace_rules.append((True, r"^START TRANSACTION;\s*$", "BEGIN TRANSACTION;", 0, None, True))
