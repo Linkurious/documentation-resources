@@ -56,7 +56,7 @@ def extractListOfValues(inputStr):
 
         if in_string:
             if c == "'":
-                    escape_quote = not escape_quote
+                escape_quote = not escape_quote
             
             value_buffer += c
         else:
