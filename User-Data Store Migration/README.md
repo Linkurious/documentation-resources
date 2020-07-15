@@ -108,11 +108,11 @@ In case of migration from MySQL server instead of Sqlite, use the following proc
 
 1. Add the `lke_export` stored procedure provided in the `mysql_export_sp.sql` script
    ```shell
-   mysql -u MY_MYSQL_USER -p -h 127.0.0.1 -e linkurious < mysql_export_sp.sql
+   mysql -u MY_MYSQL_USER -p -h 127.0.0.1 linkurious < mysql_export_sp.sql
    ```
 1. Execute the store procedure, note the presence of `-NBr` parameters (mandatory to avoid format issues)
    ```shell
-   mysql -NBr -u MY_MYSQL_USER -p -h 127.0.0.1 -e "call lke_export" linkurious > export.sql
+   mysql -NBr -u MY_MYSQL_USER -p -h 127.0.0.1 --default-character-set=utf8mb4 -e "call lke_export" linkurious > export.sql
    ```
 
 Follow the rest of the standard procedure for Sqlite migration.
