@@ -96,7 +96,7 @@ def injectStructureInfoInsertInto(match, replace):
 
     statement = match.group(0)
     match = re.match(r"^\s*INSERT\s+INTO\s*(?:(?P<quote>[\"` ])(?P<name>.*?)(?P=quote)).*VALUES\s*\((?P<values>.*)\).*$", statement)
-    assert match, "Error while parsing an Insert Statement"
+    assert match, "Error while parsing an Insert Statement: `%s`" % (statement)
     
     last_header = match.group("name")
     headers = table_header.get(last_header, None)
@@ -106,7 +106,7 @@ def injectStructureInfoInsertInto(match, replace):
 
         if __out_schema__:
             out_headers = __out_schema__.get(last_header, None)
-            assert out_headers, "Error while creating an Insert Statement, mismatch between input data and schema"
+            assert out_headers, "Error while creating an Insert Statement, mismatch between input data and schema: `%s`" % (statement)
             out_headers = set(out_headers)
             for i in range(len(in_headers) - 1, -1, -1):
                 if not in_headers[i] in out_headers:
@@ -116,7 +116,7 @@ def injectStructureInfoInsertInto(match, replace):
         headers = ([NAME_TEMPLATE % (x) for x in in_headers], entries_to_skip if len(entries_to_skip) > 0 else None)
         table_header[last_header] = headers
 
-    assert headers, "Error while creating an Insert Statement, no table definition found"
+    assert headers, "Error while creating an Insert Statement, no table definition found for `%s`" % (last_header)
 
     values = extractListOfValues(match.group("values"))
     
@@ -124,7 +124,7 @@ def injectStructureInfoInsertInto(match, replace):
         for pos in headers[1]:
             del values[pos]
 
-    assert len(headers[0]) == len(values), "Error while creating an Insert Statement, mismatch between number of headers and number of values"
+    assert len(headers[0]) == len(values), "Error while creating an Insert Statement, mismatch between number of headers and number of values for table `%s`: %s" % (last_header, statement)
     statement = ("INSERT INTO " + NAME_TEMPLATE + "(%s) VALUES(%s);\n") % (last_header, ",".join(headers[0]), ",".join(values))
     
     return statement
