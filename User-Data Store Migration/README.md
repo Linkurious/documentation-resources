@@ -33,6 +33,9 @@ The tool is designed to help a database administrator generate the correct scrip
    ```
 
    The tool has been tested to support also migration from MySQL (see the section [How to migrate from MySQL](#how-to-migrate-from-mysql)).
+
+   > /!\ Minimum requirement sqlite3 v3.19.0. Earlier versions will not export properly multiline data (e.g. queries or descriptions containing multiple lines)
+
 2. Put the `export.sql` file in the same directory of the `dump-converter.py` python script
 3. Run the program to generate a new SQL import script:
    
