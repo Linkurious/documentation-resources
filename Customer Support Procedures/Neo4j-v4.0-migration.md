@@ -40,7 +40,7 @@ In some cases you can get a communication issue after the upgrade, in other case
    - In case of a Neo4j Standalone server or Cluster configuration use `neo4j://`
    - In case of a Neo4j Standalone server or Cluster configuration using the encrypted layer use `neo4j+s://`
 1. Start Linkurious Enterprise, if the system ask to re-index don’t do it at this stage
-1. Check again the source `Key` (as don in the [pre-requisites](#pre-requisites)). Depending on the system configuration, most likely you will get a new `Key` with state needReindex and the old `Key` with state offline. If this is the scenario:
+1. Check again the source `Key` (as done in the [pre-requisites](#pre-requisites)). Depending on the system configuration, most likely you will get a new `Key` with state needReindex and the old `Key` with state offline. If this is the scenario:
    - Use the [merge feature](https://doc.linkurio.us/admin-manual/latest/merging-data-sources/) on the offline datasource into the new generated one and use the *Overwrite merge* option
    - After the merge is done, you will not see any more the old Key and all the old data is now saved within the new Key
 1. Complete any pending task to get the datasource ready (e.g. re-index)
