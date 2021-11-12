@@ -50,7 +50,7 @@ The `Alerts` feature has evolved into something more powerful and is becoming mo
 
 - All the existing alerts will be disabled after the upgrade (requiring a manual action on all of them) to allow generating new results
 - To re-enable an existing alert, it is needed to configure a new mandatory parameter (the `target`), learn more about it on [https://doc.linkurio.us/admin-manual/3.0.3/alerts/#alert-target](https://doc.linkurio.us/admin-manual/3.0.4/alerts/#alert-target)
-- Since the new feature allows to perform investigation directly in a `Case` (the new concept of item to be investigated), the previous functionality to save the results in an external visualization has been replace by the functionality of saving the ongoing investigation in the `Case` itself
+- Since the new feature allows to perform investigation directly in a `Case` (the new concept of item to be investigated), the previous functionality to save the results in an external visualization has been replaced by the functionality of saving the ongoing investigation in the `Case` itself
 - The APIs around alerts have changed name to reflect the new evolution and some of them also changed the behavior to reflect the new capabilities
 
 ## Improving connectivity with Neo4j v4
@@ -69,7 +69,7 @@ We are deprecating the usage of the `http://` protocol in favor of the faster an
 
 - Linkurious Enterprise will try to automatically discover and use the `neo4j://` protocol to connect to the database. In case the database is well configured, the system will be able to connect automatically otherwise will fail.
   
-  > 💡 Even if you don't get connectivity issues, we suggest to reconfigure  the datasource with below recommendation to avoid impacts in the future.
+  > 💡 Even if you don't get connectivity issues, we suggest to reconfigure the datasource with below recommendations to avoid impacts in the future.
 
 ***Remediation steps:***
 
