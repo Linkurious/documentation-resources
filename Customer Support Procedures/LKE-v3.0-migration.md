@@ -115,7 +115,7 @@ Clients getting benefits:
 
 Over the time we have improved the security of our application to protect our clients. As a consequence, more and more features developed in the latest releases are ensuring that the end users are connecting through the correct link.
 
-To avoid any unexpected behavior or issues with some features, please cross check that you have properly configured the [link generation](https://doc.linkurio.us/admin-manual/3.0.4/web-server/#link-generation) section: `domain` and the public ports configurations have to be configured with the correct dns name and ports used by the end users to access the web application (tipycally `localhost` is not a configuration you should see in the production environment, verify with the IT department in case of doubts).
+To avoid any unexpected behavior or issues with some features, please cross check that you have properly configured the [link generation](https://doc.linkurio.us/admin-manual/3.0.4/web-server/#link-generation) section: `domain` and the public ports configurations have to be configured with the correct dns name and ports used by the end users to access the web application (typically `localhost` is not a configuration you should see in the production environment, verify with the IT department in case of doubts).
 
 # Known issues
 
