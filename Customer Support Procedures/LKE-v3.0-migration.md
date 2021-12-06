@@ -111,6 +111,12 @@ Clients getting benefits:
 - everyone having the need of optimizing the index: be sure to set as `View only` all the Node Categories, Edge Types and/or their properties that are not relevant for the users
 - everyone looking for a full control of what users can see: be sure to configure the [Strict mode](https://doc.linkurio.us/admin-manual/3.0.4/schema-strict/) of the schema (you can eventually benefit also of the [Property-key access rights](https://doc.linkurio.us/admin-manual/3.0.4/property-level-access-rights/))
 
+## Link generation
+
+Over the time we have improved the security of our application to protect our clients. As a consequence, more and more features developed in the latest releases are ensuring that the end users are connecting through the correct link.
+
+To avoid any unexpected behavior or issues with some features, please cross check that you have properly configured the [link generation](https://doc.linkurio.us/admin-manual/3.0.4/web-server/#link-generation) section: `domain` and the public ports configurations have to be configured with the correct dns name and ports used by the end users to access the web application (tipycally `localhost` is not a configuration you should see in the production environment, verify with the IT department in case of doubts).
+
 # Known issues
 
 - The upgrade of Linkurious Enterprise when using an external MariaDB database will fail.
