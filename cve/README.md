@@ -1,4 +1,4 @@
-# Known vulnerabilities in Linkurious Enterprise
+# Security Reports for Linkurious Enterprise
 
 | Date published | Impacted versions | Fix version | Report link                         | Severity level | Notes            
 |----------------|-------------------|-------------|-------------------------------------|----------------|------
