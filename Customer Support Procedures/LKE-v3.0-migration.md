@@ -119,4 +119,4 @@ To avoid any unexpected behavior or issues with some features, please cross chec
 
 # Known issues
 
-- After an upgrade from Linkurious Enterprise 2.x, if you installing on Linux or macOS, and are using the embedded Elasticsearch instance, Elasticsearch will not start. The fix is to make the files in `system/elasticsearch/bin/` executable. If you are not sure how to do that, please [get in touch](https://doc.linkurio.us/admin-manual/latest/support/).
+- After an upgrade from Linkurious Enterprise 2.x, if you are installing on Linux or macOS, and are using the embedded Elasticsearch instance, Elasticsearch will not start. The fix is to make the files in `system/elasticsearch/bin/` executable. If you are not sure how to do that, please [get in touch](https://doc.linkurio.us/admin-manual/latest/support/).

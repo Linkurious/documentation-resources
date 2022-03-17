@@ -17,7 +17,7 @@ Neo4j v4 has introduced some breaking changes on some cypher syntax of functions
 
 As a consequence, you may have to rework your all your cypher queries such as:
 - Data import scripts
-- [Queries and Queries Templates](https://doc.linkurio.us/user-manual/latest/query-templates/) defined in Linkurious Enterprise (some users may have created their own queries, consider to warn them)
+- [Queries and Query Templates](https://doc.linkurio.us/user-manual/latest/query-templates/) defined in Linkurious Enterprise (some users may have created their own queries, consider to warn them)
 - [Alerts](https://doc.linkurio.us/user-manual/latest/alert-dashboard/) defined in Linkurious Enterprise
 
 
@@ -48,4 +48,4 @@ In some cases you can get a communication issue after the upgrade, in other case
 ***Only in a Neo4j Cluster configuration***:
 1. If the datasource setting contains the `writeURL` or `httpUrl` options, you can remove both of them. They are not needed anymore to communicate with the cluster.
 1. Now it is possible to configure the additional nodes of the Neo4j Cluster through the [alternativeURLs](https://doc.linkurio.us/admin-manual/latest/configure-neo4j/#configuration) parameter (e.g.  "alternativeURLs": ["neo4j+s://core2:7687", "neo4j+s://core3:7687"]) without the need for an external load balancer / proxy.
-1. If you were previously using a Load Balancer between Linkurios Enterprise and Neo4j, you should have configured it with sticky sessions or similar configuration to let Linkurious Enterprise work properly. If that was the only application needing this configuration, you can now revert it to a more suitable load balancing policy.
+1. If you were previously using a Load Balancer between Linkurious Enterprise and Neo4j, you should have configured it with sticky sessions or similar configuration to let Linkurious Enterprise work properly. If that was the only application needing this configuration, you can now revert it to a more suitable load balancing policy.
