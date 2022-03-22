@@ -15,4 +15,4 @@
 
 [1]: https://doc.linkurio.us/admin-manual/2.9.10/release-notes/
 [^2]: These versions support Neo4j 4.3 with the exception of the [incremental indexing](https://doc.linkurio.us/admin-manual/2.10.15/incremental-indexing/) feature.
-[^3]: Elasticsearch 6.x is supported with the neo4j-to-elasticsearch plugin
+[^3]: Elasticsearch 6.x is not supported with the neo4j-to-elasticsearch plugin
