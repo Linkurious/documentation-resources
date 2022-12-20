@@ -13,7 +13,7 @@ this document will provide you extra details of what you need to take care of in
 
 # Issues with cypher queries
 
-Neo4j v4 has introduced some breaking changes on some cypher syntax of functions (see more details on [Neo4j documentation](https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/#cypher-deprecations-additions-removals-4.0).
+Neo4j v4 has introduced some breaking changes on some cypher syntax of functions (see more details on [Neo4j documentation](https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/#cypher-deprecations-additions-removals-4.0)).
 
 As a consequence, you may have to rework your all your cypher queries such as:
 - Data import scripts
