@@ -12,8 +12,8 @@ this document will provide you extra details of what you need to take care of in
 
 # Pre-requisites and limitations
 
-- Linkurious Enterprise supports Neo4j v5 starting from the version v4.0.1, if you are working with an older version of Linkurious Enterprise
-update it before updating Neo4j (Linkurious Enterprise [update procedure](https://doc.linkurio.us/admin-manual/latest/update-procedure/))
+- Linkurious Enterprise supports Neo4j v5 starting from the version v4.0.1 (a beta release estimated to be available in January 2023).
+If you are working with an older version of Linkurious Enterprise, update it before updating Neo4j (Linkurious Enterprise [update procedure](https://doc.linkurio.us/admin-manual/latest/update-procedure/))
 
 - We recommend you do not use Neo4j v5.0.0 nor Neo4j v5.1.0. The former is a limited availability release and the latter contains a critical
 vulnerability to CVE-2022-42889, also known as Text4Shell. Use Neo4j v5.2.0 or newer.
@@ -43,5 +43,9 @@ They are named `Linkurious.incremental.<node|edge> :<LABEL>`. We recommend you e
 recreate them as RANGE indexes after the migration, without any inconvenience.
 - migrate your own BTREE indexes and then use the `--force-btree-indexes-to-range` option of the `neo4j-admin database migrate`
 command to migrate the Linkurious Enterprise indexes.
+
+When Linkurious reconnect to the data-source after the migration has completed, it is going to detect that the database
+has changed and display a warning about that. You can safely dismiss this warning. Please note that you will then have
+to fully reindex your data-source.
 
 See complete procedure on [Neo4j documentation](https://neo4j.com/docs/upgrade-migration-guide/current/version-5).
