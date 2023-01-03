@@ -21,3 +21,5 @@ The documentation listed will guide you through critical updating procedures and
 ## Neo4j
 
 * If you need to upgrade to Neo4j v4 from a previous version, please read [this](Neo4j-v4.0-migration.md)
+
+* If you need to upgrade to Neo4j v5 from a previous version, please read [this](Neo4j-v5.0-migration.md)
