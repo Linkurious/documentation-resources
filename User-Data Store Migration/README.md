@@ -157,11 +157,11 @@ However it is possible to quickly modify the tool to change / add conversion rul
 
 The tool relies on the below global variables to create the output file:
 - `pre`: an array of strings (instructions) to add at the beginning of the output file.
-- `replace_rules`: an array of `conversion rules` to apply to each input line. The rules are tried in order of definition. Each rule is a record of 6 elements:
+- `replace_rules`: an array of `conversion rules` to apply to each input line (not converted or partially converted lines are discarded). The rules are processed following the order of definition. Each rule is a record of 6 elements:
   - A `boolean` indicating whether the second parameter is a regex expression or not (just a single replace).
   - A `string` with the `match rule`. In case of regex, it is possible to define groups to be used in the replace string.
   - A `string` with the `replace string`. In case of regex, it is possible to define placeholders to be replaced with value matched in the groups (`{i}` where `i` is the group index).
   - A `number` with the number of defined groups that will be replace in the `replace string`
   - A function (used only with regex rules) getting as parameters the `regex match` and the current `replace string`. It has to return a `string` with the new `replace string`.
-  - A `boolean` indicating whether the system should stop or not to test the other rules when the current rule is matched.
+  - A `boolean` indicates whether the conversion is completed by this rule (True) or if subsequent rules should be processed to comple it before writing the output (False).
 - `post`: an array of strings (instructions) to add at the end of the output file.

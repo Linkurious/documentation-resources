@@ -28,6 +28,7 @@ def getStructureInfoCreate(match, replace):
     in_table_header[match.group(1)] = [x.group("name") for x in match_iter]
 
     if __dialect__ == "mssql":
+        # For the last processed table, reset the standard behaviour of autoincrement
         replace = (
             (
                 "IF OBJECTPROPERTY(OBJECT_ID('" + NAME_TEMPLATE + "'), 'TableHasIdentity') = 1 " +
@@ -138,26 +139,32 @@ def writeline(stream, line):
 def initialize(out):
     global pre, replace_rules, post, NAME_TEMPLATE
 
+    # Delete any action on the internal sqlite_sequence table
     replace_rules.append((True, r"^.*sqlite_sequence.*;[\r\n]*$", "", 0, None, True))
-    replace_rules.append((True, r"^PRAGMA foreign_keys=OFF;[\r\n]*$", "", 0, None, True))
+    # Fix the datetime values
     replace_rules.append((False, " +00:00'", "'", 0, None, False))
-    replace_rules.append((True, r"^INSERT INTO.*$", None, 0, injectStructureInfoInsertInto, False))
+    # Rewrite compatible insert rules
+    replace_rules.append((True, r"^INSERT INTO.*$", None, 0, injectStructureInfoInsertInto, True))
 
     if __dialect__ in ["mysql", "mariadb"]:
         NAME_TEMPLATE = "`%s`"
+        pre.append("START TRANSACTION;")
+        # Disable/enable the constraint checks
         pre.append("SET FOREIGN_KEY_CHECKS=0;")
         post.append("SET FOREIGN_KEY_CHECKS=1;")
         
-        replace_rules.append((True, r"^BEGIN TRANSACTION;\s*$", "START TRANSACTION;", 0, None, True))
+        # Extract the table structure and replace the CREATE statement with a TRUNCATE
         replace_rules.append((True, r"^CREATE TABLE `(?P<name>[^`]*)`.*$", ("TRUNCATE TABLE " + NAME_TEMPLATE + ";") % ("{1}"), 1, getStructureInfoCreate, True))
     elif __dialect__ == "mssql":
         NAME_TEMPLATE = "[%s]"
+        pre.append("BEGIN TRANSACTION;")
         pre.append("declare @query varchar(max);");
+        # Disable/enable the constraint checks for every table
         pre.append("select @query = coalesce(@query + ' ' + 'ALTER TABLE [' + name + '] NOCHECK CONSTRAINT all;', 'ALTER TABLE [' + name + '] NOCHECK CONSTRAINT all;') from sys.tables; exec(@query);")
         post.append("select @query = coalesce(@query + ' ' + 'ALTER TABLE [' + name + '] WITH CHECK CHECK CONSTRAINT all;', 'ALTER TABLE [' + name + '] WITH CHECK CHECK CONSTRAINT all;') from sys.tables; exec(@query);")
-        post.append("go")
 
-        replace_rules.append((True, r"^START TRANSACTION;\s*$", "BEGIN TRANSACTION;", 0, None, True))
+        # Extract the table structure and replace the CREATE statement with a DELETE
+        # it also allows to manually set values for columns with autoincrement
         replace_rules.append(
             (
                 True,
@@ -176,17 +183,23 @@ def initialize(out):
         )
 
 
+# To write custom output after writing the `pre` variable
 def post_initialize(out):
     pass
 
 
+# To write custom output before writing the `post` variable
 def pre_finalize(out):
     if __dialect__ == "mssql" and last_header:
+        # For the last processed table, reset the standard behaviour of autoincrement
         writeline(out, ("IF OBJECTPROPERTY(OBJECT_ID('" + NAME_TEMPLATE + "'), 'TableHasIdentity') = 1 SET IDENTITY_INSERT " + NAME_TEMPLATE + " OFF;") % (last_header, last_header))
 
 
+# To write custom output after writing the `post` variable
 def finalize(out):
-    pass
+    writeline(out, "COMMIT;")
+    if __dialect__ == "mssql":
+        writeline(out, "go")
 
 
 if __name__ == '__main__':
@@ -216,7 +229,7 @@ if __name__ == '__main__':
             writeline(dst, pre)
             post_initialize(dst)
 
-            multiline_create_buffer = ""
+            # multiline_create_buffer = ""
             for line in src:
                 #
                 # Backup code:
@@ -264,8 +277,6 @@ if __name__ == '__main__':
                                 break
                             else:
                                 line = newLine
-                else:
-                    writeline(dst, line)
             
             pre_finalize(dst)
             writeline(dst, post)
