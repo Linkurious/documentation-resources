@@ -197,7 +197,13 @@ def pre_finalize(out):
 
 # To write custom output after writing the `post` variable
 def finalize(out):
+    # Always COMMIT the transaction at the end of the file.
+    # In case of errors of the script, either the transaction is auto-rollbacked
+    # or it is safe to execute again the script to delete all data and reimport them
     writeline(out, "COMMIT;")
+
+    # Line nedded at the end of the script to ensure all MSSQL tools
+    # will properly interpret the file as a full script to be executed
     if __dialect__ == "mssql":
         writeline(out, "go")
 
