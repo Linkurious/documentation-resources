@@ -9,7 +9,7 @@
 | [Elasticsearch][c]         | 1.4 - 6.8[^3] | 6.0 - 7.x[^3] | 6.0 - 7.x[^3] | 6.0 - 7.x     |      7.x        |
 | [JanusGraph][d]            | 0.1.x - 0.2.x |      No       |      No       |      No       |      No         |
 | [Azure Cosmos DB][e]       |      Yes      |      Yes      |      Yes      |      Yes      |      Yes        |
-| [Memgraph][f]              |      No       |      No       |      No       |      No       | 2.4 - 2.6[^4]   |
+| [Memgraph][f]              |      No       |      No       |      No       |      No       | 2.4 - 2.7[^4]   |
 | [Amazon Neptune][g]        |      No       |      No       |      No       |      No       |   1.2.0[^4]     |
 | [MySQL][h]                 |   5.6 - 8.0   |   5.6 - 8.0   |   5.6 - 8.0   |   5.6 - 8.0   |   5.6 - 8.0     |
 | [MariaDB][i]               |  10.1 - 10.5  |  10.1 - 10.5  |  10.1 - 10.5  |  10.1 - 10.5  |  10.1 - 10.5    |
