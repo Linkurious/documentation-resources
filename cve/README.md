@@ -6,3 +6,4 @@
 | 2022-03-18     | v3.0.10 and older | v3.0.11     | [LK-SEC-2022-1](LK-SEC-2022-1.md)   | Low            | OpenSSL related
 | 2022-04-05     | None              | None        | [LK-SEC-2022-2](LK-SEC-2022-2.md)   | Info           | Spring4Shell
 | 2022-11-02     | None              | None        | [LK-SEC-2022-3](LK-SEC-2022-3.md)   | Info           | OpenSSL 3 related
+| 2023-04-06     | Non-Docker builds | None        | [LK-SEC-2023-1](LK-SEC-2023-1.md)   | Low            | SnakeYAML related
