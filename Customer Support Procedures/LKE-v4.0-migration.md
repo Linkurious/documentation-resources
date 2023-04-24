@@ -22,23 +22,21 @@ The `Alerts` feature has evolved and an alert can now contain multiple cypher qu
 
 ***Benefits:***
 
-- Enhanced deduplication across cases with multiple cypher queries per alerts
+- Enhanced deduplication across cases with multiple cypher queries per alert
 - Better business indicators with a dedicated query to process alerts columns
-- Up to 40 custom columns per alerts
+- Up to 40 custom columns per alert
 - Alerts can be run manually directly through the interface
 
 ***Impacts:***
 
-When migrating to alerts 4.0 there are a few changes that will be applied to the alert’s already existing matches, queries and case attributes.
+When migrating to alerts 4.0 there are a few changes that will be applied to alerts’ already existing matches, queries and case attributes.
 **Queries:** Each alert will still have its pre-existing query, however since alert queries now have their own properties as discussed earlier, the default name for the query will be 
 `query#{queryId}` and the `description` property will be empty.
 
-**Case attributes:** all the existing case columns will remain the same after the migration unless:
+**Case attributes:** all the existing case columns computed values will remain the same after the migration unless the user defines the alert’s case attributes query for the alert. In that case all the case columns will be re-computed in the next alert run overriding the pre-existing column values. 
+> If the user defines a wrong case attributes query, all the existing column values will be cleared in the next alert run and will remain empty until the problem has been fixed.
 
-- The user defines the alert’s case attributes query for the alert, in that case all the case columns will be re-computed in the next alert run overriding the pre-existing  column values.
-- The user defines a faulty case attributes query, in that case all the existing column values will be cleared in the next alert run.
-
-**Alert’s general info:** The alert’s properties name, description, target, frequency, enablement, sharing options remain the same.
+**Alert’s general info:** The alert’s properties: name, description, target, frequency, enablement, sharing options remain the same.
 
 ## Shared Spaces
 
@@ -57,7 +55,7 @@ We are releasing a new way to share content across teams. Spaces are specific ar
 ***Impacts:***
 
 - The visualization dashboard doesn't exists anymore and has been replaced by a private space called "My Files". 
+- The dashboard search bar has been removed. To start an investigation, users will have first to open a visualization.
 - All visualizations owned by a user will be migrated to "My Files".
 - There's a new admin right to manage resources.
   
-  > 💡 Even if you don't get connectivity issues, we suggest to reconfigure the datasource with below recommendations to avoid impacts in the future.
