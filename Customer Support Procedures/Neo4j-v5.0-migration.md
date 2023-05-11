@@ -18,8 +18,7 @@ If you are working with an older version of Linkurious Enterprise, update it bef
 - We recommend you do not use Neo4j v5.0.0 nor Neo4j v5.1.0. The former is a limited availability release and the latter contains a critical
 vulnerability to CVE-2022-42889, also known as Text4Shell. Use Neo4j v5.2.0 or newer.
 
-- On Neo4j v5, incremental indexing is only supported on standalone servers. If your data-source is a Neo4j cluster and
-you are using incremental indexing, consider staying on Neo4j v4.4 until incremental indexing is supported on Neo4j v5 clusters.
+- Incremental indexing is supported on a Neo4j v5 clusters starting from Linkurious Enterprise v4.0.4
 
 # Issues with cypher queries
 
