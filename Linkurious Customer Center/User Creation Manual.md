@@ -8,7 +8,7 @@ in a few simple clicks:
     
     ![Home](assets/home.png)
     
-2. Scroll till the section `Contacts` where you can see and maintain your team members
+2. Scroll to the section `Contacts` where you can see and maintain your team members
     
     ![Contacts](assets/contacts.png)
     
