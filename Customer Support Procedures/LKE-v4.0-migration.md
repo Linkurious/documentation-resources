@@ -9,6 +9,8 @@ this document will provide you extra details of what you need to take care or do
 - [General major changes](#general-major-changes)
   - [New multi model alerts](#new-multi-model-alerts)
   - [Shared Spaces](#shared-spaces)
+  - [Security updates](#security-updates)
+- [Dropped Support section](#dropped-support-section)
 
 # General major changes
 
@@ -56,4 +58,77 @@ We are releasing a new way to share content across teams. Spaces are specific ar
 
 - The dashboard search bar has been removed. To start an investigation, users will have first to open a visualization.
 - There's a new admin right to manage resources.
+
+## Security updates
+
+We have updated our internal dependencies to new major releases to offer up to date securities fixes.
+The new version is rejecting by default security certificates that use outdated security algorithms. This can cause possible connection issues.
+
+***Impacted clients:***
+
+- Every customer using secure connection with certificates that use outdated securities algorithms
+
+***Benefits:***
+
+- Enhanced Security
+
+***Impacts:***
+
+- If Linkurious Enterprise is configured to bind on the `HTTPS` port and the certificate uses outdated securities algorithms, the system will faild to start (the [system logs][6] contains relevant information about this error).
+- If Linkurious Enterprise is connected to external systems (e.g. graph database, external authentication providers, etc.) through a secure channel having a certificate using outdated securities, the system will refuse to enstablish the connection. The error will be a generic connection issues visible from the interface or the [system logs][6] depending on the faulty component.
+
+***Remediation steps:***
+
+We recommend to regenerate the problematic certificates with new one following the latest security standards.
+
+If this is not possible in the short term and you need a **temporary** fix to this problem, you can follow the below steps to allow Linkurious Enterprise accepting old certificates:
+- [Stop Linkurious Enterprise][1]
+- [Uninstall Linkurious Enterprise from the system services][2] (if it was installed as such)
+- Edit the `<linkurious>/data/manager/manager.json` file and add both `--openssl-legacy-provider` and `--tls-cipher-list=DEFAULT@SECLEVEL=0` options to the environment variable for the `Linkurious Server` service.
   
+  You should now have something like the below example:
+  ```json
+  ...
+  "services": [
+    {
+      "name": "Linkurious Server",
+      ...
+      "env": {
+        "NODE_OPTIONS": "--openssl-legacy-provider --tls-cipher-list=DEFAULT@SECLEVEL=0"
+      }
+    }
+   ]
+   ...
+  ```
+  If you alredy have some configuration, concatenate the new one separated by a space to have something similar to the below example:
+  ```json
+  ...
+  "services": [
+    {
+      "name": "Linkurious Server",
+      ...
+      "env": {
+        "NODE_OPTIONS": "--old-configuration --openssl-legacy-provider --tls-cipher-list=DEFAULT@SECLEVEL=0"
+      }
+    }
+   ]
+   ...
+  ```
+- [Reinstall Linkurious Enterprise as a system services][3] (if needed)
+- [Start Linkurious Enterprise][4]
+- You are good to go!
+
+After you properly renewed the certificates, revert the above changes.
+
+# Dropped Support section
+
+- Dropped support for legacy Operating Systems, check out the [new list][5]
+  - Impacted clients: everyone using old operating systems
+  - Remediation: verify the new support list and upgrade legacy systems accordingly
+
+[1]: https://doc.linkurio.us/admin-manual/4.0/stop/
+[2]: https://doc.linkurious.com/admin-manual/4.0/install/#uninstall-from-services
+[3]: https://doc.linkurious.com/admin-manual/4.0/install/#install-as-a-service
+[4]: https://doc.linkurio.us/admin-manual/4.0/start/
+[5]: https://doc.linkurio.us/admin-manual/4.0/requirements/#operating-system
+[6]: https://doc.linkurious.com/admin-manual/4.0/logs/
