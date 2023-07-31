@@ -54,8 +54,6 @@ We are releasing a new way to share content across teams. Spaces are specific ar
 
 ***Impacts:***
 
-- The visualization dashboard doesn't exists anymore and has been replaced by a private space called "My Files". 
 - The dashboard search bar has been removed. To start an investigation, users will have first to open a visualization.
-- All visualizations owned by a user will be migrated to "My Files".
 - There's a new admin right to manage resources.
   
