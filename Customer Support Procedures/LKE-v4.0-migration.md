@@ -125,6 +125,9 @@ After you properly renewed the certificates, revert the above changes.
 - Dropped support for legacy Operating Systems, check out the [new list][5]
   - Impacted clients: everyone using old operating systems
   - Remediation: verify the new support list and upgrade legacy systems accordingly
+- Dropped support for legacy browsers, check out the [new list][7]
+  - Impacted clients: everyone using old browsers
+  - Remediation: verify the new support list and upgrade legacy browsers
 
 [1]: https://doc.linkurio.us/admin-manual/4.0/stop/
 [2]: https://doc.linkurious.com/admin-manual/4.0/install/#uninstall-from-services
@@ -132,3 +135,4 @@ After you properly renewed the certificates, revert the above changes.
 [4]: https://doc.linkurio.us/admin-manual/4.0/start/
 [5]: https://doc.linkurio.us/admin-manual/4.0/requirements/#operating-system
 [6]: https://doc.linkurious.com/admin-manual/4.0/logs/
+[7]: https://doc.linkurious.com/admin-manual/4.0/client-requirements/#desktop-browsers
