@@ -79,7 +79,7 @@ The new version is rejecting by default security certificates that use outdated 
 
 ***Remediation steps:***
 
-We recommend to regenerate the problematic certificates with new one following the latest security standards.
+We stringly suggest to regenerate the problematic certificates with new one that matches modern security standards (e.g. don't use MD5 for key hashing), see requirement [here][8].
 
 If this is not possible in the short term and you need a **temporary** fix to this problem, you can follow the below steps to allow Linkurious Enterprise accepting old certificates:
 - [Stop Linkurious Enterprise][1]
@@ -136,3 +136,4 @@ After you properly renewed the certificates, revert the above changes.
 [5]: https://doc.linkurio.us/admin-manual/4.0/requirements/#operating-system
 [6]: https://doc.linkurious.com/admin-manual/4.0/logs/
 [7]: https://doc.linkurious.com/admin-manual/4.0/client-requirements/#desktop-browsers
+[8]: https://www.openssl.org/docs/manmaster/man3/SSL_CTX_set_security_level.html#Level-1
