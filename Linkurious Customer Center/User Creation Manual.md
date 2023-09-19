@@ -1,6 +1,6 @@
 # User Creation Manual
 
-If you have been identified as a `Business Owner` of a project using one of the Linkurious technologies,
+If you have been identified as a `Business Owner` / `Project Manager` of a project using one of the Linkurious technologies,
 you can add new members to your project through the [Linkurious Customer Center](https://get.linkurio.us/)
 in a few simple clicks:
 
