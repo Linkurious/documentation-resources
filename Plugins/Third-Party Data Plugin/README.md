@@ -26,11 +26,11 @@ An **API integration** is a configuration that contains:
 ## Tutorials & examples
 How to get details for a node, from Linkurious Enterprise:
 
-![Get details for a node](assets/d050f4a6-50ca-4961-9aeb-1795a474b425.mov)
+https://github.com/Linkurious/documentation-resources/raw/GEN-927-adding-plugin-doc/Plugins/Third-Party%20Data%20Plugin/assets/d050f4a6-50ca-4961-9aeb-1795a474b425.mov
 
 How to create a new integration:
 
-![Create a new integration]([assets/29fffcc0-16d5-4699-bc3e-7e3a8660363e.mov](https://github.com/Linkurious/documentation-resources/raw/GEN-927-adding-plugin-doc/Plugins/Third-Party%20Data%20Plugin/assets/29fffcc0-16d5-4699-bc3e-7e3a8660363e.mov))
+https://github.com/Linkurious/documentation-resources/raw/GEN-927-adding-plugin-doc/Plugins/Third-Party%20Data%20Plugin/assets/29fffcc0-16d5-4699-bc3e-7e3a8660363e.mov
 
 Screenshot of the main search interface:
 ![plugin_data_preview](assets/d7937516-2932-438d-89c4-aa707017506d.png)
