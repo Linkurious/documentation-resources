@@ -10,6 +10,7 @@ this document will provide you extra details of what you need to take care or do
   - [Requirements](#requirements)
   - [Improved support for resources migration](#improved-support-for-resources-migration)
   - [Resources ownership](#resources-ownership)
+  - [Simplified log configuration](#simplified-log-configuration)
   - [Security updates](#security-updates)
 - [Dropped Support section](#dropped-support-section)
 
@@ -82,6 +83,27 @@ Migration of assets created between different instances (using the Configuration
 
 The `Manage, edit read/write queries & run` option for the `Queries`, `custom actions`, `alerts` and `node group rule`
 access-rights is enabled for the following builtin groups: `Admin` and `Source Manager`.
+
+## Simplified log configuration
+
+In Linkurious v4.0, the logs configuration file had two differents settings for the default log level,
+named `logLevel` and `externalLibLogLevel`.
+
+In Linkurious v4.1, we simplify that by merging these two settings into a new one named `defaultLevel`,
+which defaults to `info`.
+
+***Impacted clients:***
+
+All Linkurious clients actively using logs.
+
+***Benefits:***
+
+This change simplify the logs configuration.
+
+***Impacts:***
+
+The default log level in the `data/config/logger.json` file is changed to `info`.
+If needed, it can be changed to another value once Linkurious enterprise is updated to v4.1.
 
 ## Security updates
 
