@@ -24,7 +24,7 @@ We strongly recommend backing-up your SQL database and your installation folder 
 
 ## Improved support for resources migration
 
-Universally unique identifiers (UUID) are 128-bit labels that looks like `c7b30a93-207b-417e-b4f5-4f6e45818595`.
+Universally unique identifiers (UUID) are 128-bit labels that look like `c7b30a93-207b-417e-b4f5-4f6e45818595`.
 A UUID uniquely identifies a resource, no matter its kind and the Linkurious Enterprise instance it resides in.
 
 UUIDs have been added to Linkurious enterprise's resources:
@@ -42,7 +42,7 @@ Everyone using the Configuration Migration Plugin.
 
 ***Benefits:***
 
-This solves issues caused by renamed resources, allowing more reliable synchronization between Linkurious Enterprise instances.
+This solves issues caused by renamed resources, allowing more reliable synchronizations between Linkurious Enterprise instances.
 
 ***Impacts:***
 
@@ -59,19 +59,29 @@ You can get the list of all your queries with their ID and and UUID using the [G
 
 ## Resources ownership
 
-To be completed
+In Linkurious 4.1, we aim to standardize and improve user rights to facilitate onboarding and offboarding of new employees,
+as well as giving Linkurious administrators greater freedom to manage access restrictions to the application's functionalities.
+
+A new administrator right has been added for queries, custom actions and alerts.
+This right allows the user to edit and delete any asset created by other Linkurious users.
+We have also added node group rule creation rights, to harmonize rights.
+A node group rule can therefore be modified and deleted by the creator
+or a user with the `Manage, edit read/write queries & run` right level.
 
 ***Impacted clients:***
 
-To be completed
+All Linkurious clients using queries, custom actions, alerts or node grouping.
 
 ***Benefits:***
 
-To be completed
+Rights management has been harmonized between queries, custom actions, alerts and node grouping.
+A user with sufficient rights can edit and delete any element created by other users.
+Migration of assets created between different instances (using the Configuration Migration Plugin) has also been facilitated.
 
 ***Impacts:***
 
-To be completed
+The `Manage, edit read/write queries & run` option for the `Queries`, `custom actions`, `alerts` and `node group rule`
+access-rights is enabled for the following builtin groups: `Admin` and `Source Manager`.
 
 ## Security updates
 
