@@ -9,6 +9,7 @@ this document will provide you extra details of what you need to take care or do
 - [General major changes](#general-major-changes)
   - [New multi model alerts](#new-multi-model-alerts)
   - [Shared Spaces](#shared-spaces)
+  - [Worker pool](#worker-pool)
   - [Security updates](#security-updates)
 - [Dropped Support section](#dropped-support-section)
 
@@ -58,6 +59,22 @@ We are releasing a new way to share content across teams. Spaces are specific ar
 
 - The dashboard search bar has been removed. To start an investigation, users will have first to open a visualization.
 - There's a new admin right to manage resources.
+
+# Worker pool
+The worker pool has been introduced to handle heavy computation tasks by offloading it from the main Linkurious enterprise process. 
+Currently, the worker pool is used for running alerts, custom queries and visualization layouts.
+
+***Impacted clients:***
+
+- Every customer
+
+***Benefits:***
+
+- Enhanced the responsiveness of the application by offloading heavy computation tasks to separate threads.
+
+***Impacts:***
+
+- The configuration `advanced.layoutWorkers` has been removed from the configuration file as the layout computation is now handled by the worker pool.
 
 ## Security updates
 
