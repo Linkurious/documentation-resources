@@ -122,6 +122,7 @@ Currently, the worker pool is used for running alerts, custom queries and visual
 
 - The configuration `advanced.layoutWorkers` has been removed from the configuration file as the layout computation is now handled by the worker pool.
 
+See how to enable and configure the worker pool in [the Linkurious Enterprise documentation](https://doc.linkurious.com/admin-manual/latest/advanced-settings/#worker-pool-settings).
 
 ## Security updates
 
