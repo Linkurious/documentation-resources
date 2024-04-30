@@ -11,6 +11,7 @@ this document will provide you extra details of what you need to take care or do
   - [Improved support for resources migration](#improved-support-for-resources-migration)
   - [Resources ownership](#resources-ownership)
   - [Simplified log configuration](#simplified-log-configuration)
+  - [Worker pool](#worker-pool)
   - [Security updates](#security-updates)
 - [Dropped Support section](#dropped-support-section)
 
@@ -104,6 +105,24 @@ This change simplify the logs configuration.
 
 The default log level in the `data/config/logger.json` file is changed to `info`.
 If needed, it can be changed to another value once Linkurious enterprise is updated to v4.1.
+
+# Worker pool
+The worker pool has been introduced to handle heavy computation tasks by offloading it from the main Linkurious enterprise process.
+Currently, the worker pool is used for running alerts, custom queries and visualization layouts.
+
+***Impacted clients:***
+
+- Every customer
+
+***Benefits:***
+
+- Enhanced the responsiveness of the application by offloading heavy computation tasks to separate threads.
+
+***Impacts:***
+
+- The configuration `advanced.layoutWorkers` has been removed from the configuration file as the layout computation is now handled by the worker pool.
+
+See how to enable and configure the worker pool in [the Linkurious Enterprise documentation](https://doc.linkurious.com/admin-manual/latest/advanced-settings/#worker-pool-settings).
 
 ## Security updates
 
