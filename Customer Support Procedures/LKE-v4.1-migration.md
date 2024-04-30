@@ -31,7 +31,7 @@ A UUID uniquely identifies a resource, no matter its kind and the Linkurious Ent
 
 UUIDs have been added to Linkurious enterprise's resources:
 - Custom groups
-- Static queries & query templates
+- Queries
 - Custom actions
 - Node grouping rules
 - Spaces
@@ -48,7 +48,7 @@ This solves issues caused by renamed resources, allowing more reliable synchroni
 
 ***Impacts:***
 
-Static queries and query templates can be referred to by their identifier in various parts of Linkurious Enterprise:
+Queries can be referred to by their identifier in various parts of Linkurious Enterprise:
 - In [Custom actions][1]
 - In [Deep links][2]
 - To populate the [Guest mode workspace][3]
