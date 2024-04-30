@@ -81,7 +81,7 @@ A user with sufficient rights can edit and delete any element created by other u
 Migration of assets created between different instances (using the Configuration Migration Plugin) has also been facilitated.
 
 ***Impacts:***
-
+* The `Can create and apply node grouping rules` right is applied to every previously created custom groups.
 The `Manage, edit read/write queries & run` option for the `Queries`, `custom actions`, `alerts` and `node group rule`
 access-rights is enabled for the following builtin groups: `Admin` and `Source Manager`.
 
