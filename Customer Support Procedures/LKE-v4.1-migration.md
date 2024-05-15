@@ -6,8 +6,8 @@ this document will provide you extra details of what you need to take care or do
 
 <!-- omit in toc -->
 # Table of contents
+- [Requirements](#requirements)
 - [General major changes](#general-major-changes)
-  - [Requirements](#requirements)
   - [Resources ownership](#resources-ownership)
   - [Simplified log configuration](#simplified-log-configuration)
   - [Worker pool](#worker-pool)
