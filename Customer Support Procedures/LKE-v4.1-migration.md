@@ -11,6 +11,7 @@ this document will provide you extra details of what you need to take care or do
   - [Resources ownership](#resources-ownership)
   - [Simplified log configuration](#simplified-log-configuration)
   - [Worker pool](#worker-pool)
+  - [Improved support for resources migration](#improved-support-for-resources-migration)
   - [Security updates](#security-updates)
 - [Dropped Support section](#dropped-support-section)
 
@@ -70,7 +71,8 @@ This change simplify the logs configuration.
 The default log level in the `data/config/logger.json` file is changed to `info`.
 If needed, it can be changed to another value once Linkurious enterprise is updated to v4.1.
 
-# Worker pool
+## Worker pool
+
 The worker pool has been introduced to handle heavy computation tasks by offloading it from the main Linkurious enterprise process.
 Currently, the worker pool is used for running alerts, custom queries and visualization layouts.
 
@@ -88,6 +90,48 @@ Currently, the worker pool is used for running alerts, custom queries and visual
 
 See how to enable and configure the worker pool in [the Linkurious Enterprise documentation](https://doc.linkurious.com/admin-manual/latest/advanced-settings/#worker-pool-settings).
 
+## Improved support for resources migration
+
+In order to improve the robustness of resources migration, universally unique identifiers have been added
+to Linkurious enterprise's resources:
+- Custom groups
+- Queries
+- Custom actions
+- Node grouping rules
+- Spaces
+- Alerts & alert folders
+
+Universally unique identifiers (UUID) are a 128-bit labels that look like `c7b30a93-207b-508e-b4f5-4f6e45818595`.
+A UUID uniquely identifies a resource for a given data-source and is immutable.
+
+For queries specifically, a shortened variant (named "short UUID") has also been introduced. It corresponds to
+the first eight characters of the associated UUID, so for instance `c7b30a93`.
+
+***Impacted clients:***
+
+Everyone using the Configuration Migration Plugin.
+
+***Benefits:***
+
+This solves issues caused by renamed resources, allowing reliable synchronizations between data-sources.
+
+***Impacts:***
+
+Queries can be referred to by their identifier in various parts of Linkurious Enterprise:
+- In [Custom actions][1]
+- In [Deep links][2]
+- To populate the [Guest mode workspace][3]
+- In the [Data-table Plugin][4]
+
+In each of these references, the query ID should be replaced by the associated short UUID,
+to ensure the resource referencing the query can be synchronized to another Linkurious
+Enterprise instance without inconsistencies.
+
+The query identifier displayed on the query detail panel is now the short UUID, as this is the preferred
+way to reference a query (referencing a query by its ID or UUID is also supported).
+
+You can get the list of all your queries with their ID, UUID and short UUID using the [Get queries API][5].
+
 ## Security updates
 
 We have updated our internal dependencies to new major releases to offer up to date securities fixes.
@@ -102,8 +146,13 @@ We have updated our internal dependencies to new major releases to offer up to d
 
 # Dropped Support section
 
-- Dropped support for legacy database vendors, check out the [new list][1]
+- Dropped support for legacy database vendors, check out the [new list][6]
   - Impacted clients: everyone using old database vendors
   - Remediation: verify the new support list and upgrade legacy database vendors accordingly
 
-[1]: https://github.com/Linkurious/documentation-resources/blob/master/compatibility-matrix/compatibility-matrix.md
+[1]: https://doc.linkurious.com/user-manual/latest/custom-actions/
+[2]: https://doc.linkurious.com/admin-manual/latest/deep-link/
+[3]: https://doc.linkurious.com/admin-manual/latest/guest-mode/#populating-the-guest-mode-workspace
+[4]: https://github.com/Linkurious/lke-plugin-data-table
+[5]: https://doc.linkurious.com/server-sdk/latest/apidoc/#api-Query-getQueries
+[6]: https://github.com/Linkurious/documentation-resources/blob/master/compatibility-matrix/compatibility-matrix.md
