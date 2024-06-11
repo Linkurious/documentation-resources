@@ -82,6 +82,8 @@ Get the application URL by running these commands:
   export CONTAINER_PORT=$(kubectl get pod --namespace ogma $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
   echo "Visit http://127.0.0.1:8080 to use your application"
   kubectl --namespace ogma port-forward $POD_NAME 8080:$CONTAINER_PORT
+
+  Please log in using username: "ogma" and  password: "******".
 ```
 
 This command temporarily port-forwards from `localhost:8080` to `your-pod:8080`, meaning you can view the Ogma user-interface at <http://localhost:8080> while that command runs.
