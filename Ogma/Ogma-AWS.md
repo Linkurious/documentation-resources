@@ -84,19 +84,19 @@ Once a successfuly deployed, Ogma starts a web-server running on port `8080`.
 
 There are many different options to configure network egress allowing access to the Ogma pod on port `8080`, one simple option to validate a deployment is to follow the notes provided by the output of the Helm install command:
 
-Get the application URL by running these commands:
-
+Example output of the Help install command:
 ```sh
+NOTES:
+1. Get the application URL by running these commands:
   export POD_NAME=$(kubectl get pods --namespace ogma -l "app.kubernetes.io/name=ogma,app.kubernetes.io/instance=ogma" -o jsonpath="{.items[0].metadata.name}")
   export CONTAINER_PORT=$(kubectl get pod --namespace ogma $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
-  echo "Visit http://127.0.0.1:8080 to use your application"
+  echo "Visit http://127.0.0.1:8080/ogma/latest/ to use your application"
   kubectl --namespace ogma port-forward $POD_NAME 8080:$CONTAINER_PORT
-
-  Please log in using username: "ogma" and  password: "******".
+2. Please log in using username: "ogma" and password: "******".
 ```
 
-This command temporarily port-forwards from `localhost:8080` to `your-pod:8080`, meaning you can view the Ogma user-interface at <http://localhost:8080> while that command runs.
+These commands temporarily port-forwards from `localhost:8080` to `your-pod:8080`, meaning you can view the Ogma user-interface at <http://localhost:8080/ogma/latest/> while that command runs.
 
-## Get help!
+## Getting support
 
 For assistance installing and configuring Ogma on the AWS Marketplace [please get in touch](https://doc.linkurious.com/ogma/latest/contact.html)
