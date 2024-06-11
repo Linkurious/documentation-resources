@@ -59,7 +59,7 @@ aws ecr get-login-password \
 
 mkdir ogma && cd ogma
 
-helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma --version 0.2.0
+helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma --version 0.2.1
 
 tar xf $(pwd)/* && find $(pwd) -maxdepth 1 -type f -delete
 ```
@@ -67,7 +67,7 @@ tar xf $(pwd)/* && find $(pwd) -maxdepth 1 -type f -delete
 Install the Helm chart:
 
 ```sh
-helm install ogma-0-2-0 \
+helm install ogma \
     --namespace ogma ./* \
     --set serviceAccount.create=false \
     --set serviceAccount.name=ogma
