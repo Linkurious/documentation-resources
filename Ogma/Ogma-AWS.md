@@ -84,7 +84,7 @@ Once a successfuly deployed, Ogma starts a web-server running on port `8080`.
 
 There are many different options to configure network egress allowing access to the Ogma pod on port `8080`, one simple option to validate a deployment is to follow the notes provided by the output of the Helm install command:
 
-Example output of the Help install command:
+Example output of the Helm install command:
 ```sh
 NOTES:
 1. Get the application URL by running these commands:
@@ -95,7 +95,7 @@ NOTES:
 2. Please log in using username: "ogma" and password: "******".
 ```
 
-These commands temporarily port-forwards from `localhost:8080` to `your-pod:8080`, meaning you can view the Ogma user-interface at <http://localhost:8080/ogma/latest/> while that command runs.
+These commands temporarily port-forwards from `localhost:8080` to `your-pod:8080`, meaning you can view the Ogma user-interface at <http://localhost:8080/ogma/latest/> while these commands run.
 
 ## Getting support
 
