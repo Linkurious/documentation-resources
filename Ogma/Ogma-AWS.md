@@ -102,7 +102,7 @@ These commands temporarily port-forwards from `localhost:8080` to `your-pod:8080
 
 ### Pull the image
 
-Login to ecr:
+Login to the ECR (Elastic Container Registry):
 
 ```sh
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 709825985650.dkr.ecr.us-east-1.amazonaws.com
@@ -114,15 +114,15 @@ Pull the image:
 docker pull 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-container:5.0.8-rc2
 ```
 
-### Running the container
+### Run the container
 
-You can now run the container exposing port 8080 locally.
+You can now run the container, exposing port `8080` locally.
 
 ```sh
 docker run --rm -p8080:8080 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-container:5.0.8-rc2
 ```
 
-Please visit <http://127.0.0.1:8080/ogma/latest/> to use your application
+You can now open <http://127.0.0.1:8080/ogma/latest/> to use the application.
 
 ## Getting support
 
