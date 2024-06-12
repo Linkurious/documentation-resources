@@ -85,6 +85,7 @@ Once a successfuly deployed, Ogma starts a web-server running on port `8080`.
 There are many different options to configure network egress allowing access to the Ogma pod on port `8080`, one simple option to validate a deployment is to follow the notes provided by the output of the Helm install command:
 
 Example output of the Helm install command:
+
 ```sh
 NOTES:
 1. Get the application URL by running these commands:
@@ -96,6 +97,32 @@ NOTES:
 ```
 
 These commands temporarily port-forwards from `localhost:8080` to `your-pod:8080`, meaning you can view the Ogma user-interface at <http://localhost:8080/ogma/latest/> while these commands run.
+
+## Launch standalone container
+
+### Pull the image
+
+Login to ecr:
+
+```sh
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 709825985650.dkr.ecr.us-east-1.amazonaws.com
+```
+
+Pull the image:
+
+```sh
+docker pull 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-container:5.0.8-rc2
+```
+
+### Running the container
+
+You can now run the container exposing port 8080 locally.
+
+```sh
+docker run --rm -p8080:8080 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-container:5.0.8-rc2
+```
+
+Please visit <http://127.0.0.1:8080/ogma/latest/> to use your application
 
 ## Getting support
 
