@@ -59,7 +59,7 @@ aws ecr get-login-password \
 
 mkdir ogma && cd ogma
 
-helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma --version 0.2.1
+helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma --version 0.2.2
 
 tar xf $(pwd)/* && find $(pwd) -maxdepth 1 -type f -delete
 ```
@@ -80,7 +80,7 @@ These actions, and the following instructions to launch the product, can be foun
 
 ## Accessing the user interface
 
-Once a successfuly deployed, Ogma starts a web-server running on port `8080`.
+Once a successfully deployed, Ogma starts a web-server running on port `8080`.
 
 There are many different options to configure network egress allowing access to the Ogma pod on port `8080`, one simple option to validate a deployment is to follow the notes provided by the output of the Helm install command:
 
