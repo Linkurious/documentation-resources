@@ -59,7 +59,7 @@ aws ecr get-login-password \
 
 mkdir ogma && cd ogma
 
-helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma --version 0.2.3
+helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma --version 0.2.4
 
 tar xf $(pwd)/* && find $(pwd) -maxdepth 1 -type f -delete
 ```
