@@ -124,6 +124,24 @@ docker run --rm -p8080:8080 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkuri
 
 You can now open <http://127.0.0.1:8080/ogma/latest/> to use the application.
 
+### Run the container with password protection
+
+Generate an `htpasswd` file locally, for a user named `ogma`:
+
+```sh
+htpasswd ./htpasswd ogma
+```
+
+Alternatively use on online generator such as <https://www.web2generators.com/apache-tools/htpasswd-generator>, and save the content to a file named htpasswd
+
+You can now run the container, exposing port `8080` locally.
+
+```sh
+docker run --rm -p8080:8080 -v ./htpasswd:/etc/nginx/htpasswd-conf/htpasswd 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-container:5.0.8-rc2
+```
+
+You can now open <http://127.0.0.1:8080/ogma/latest/> to use the application, you will need to provide username and password used to generate the `htpasswd` file.
+
 ## Getting support
 
 For assistance installing and configuring Ogma on the AWS Marketplace [please get in touch](https://doc.linkurious.com/ogma/latest/contact.html)
