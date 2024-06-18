@@ -127,6 +127,7 @@ You can now open <http://127.0.0.1:8080/ogma/latest/> to use the application.
 ### Run the container with password protection
 
 Generate an `htpasswd` file locally, for a user named `ogma`:
+
 ```sh
 htpasswd ./htpasswd ogma
 ```
