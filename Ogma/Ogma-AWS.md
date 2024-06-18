@@ -111,7 +111,7 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 Pull the image:
 
 ```sh
-docker pull 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-container:5.0.8-rc3
+docker pull 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-container:5.0.8-rc4
 ```
 
 ### Run the container
@@ -119,7 +119,7 @@ docker pull 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-contain
 You can now run the container, exposing port `8080` locally.
 
 ```sh
-docker run --rm -p8080:8080 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-container:5.0.8-rc3
+docker run --rm -p8080:8080 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-container:5.0.8-rc4
 ```
 
 You can now open <http://127.0.0.1:8080/ogma/latest/> to use the application.
@@ -137,7 +137,7 @@ Alternatively use on online generator such as <https://www.web2generators.com/ap
 You can now run the container, exposing port `8080` locally.
 
 ```sh
-docker run --rm -p8080:8080 -v ./htpasswd:/etc/nginx/htpasswd-conf/htpasswd 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-container:5.0.8-rc3
+docker run --rm -p8080:8080 -v ./htpasswd:/etc/nginx/htpasswd-conf/htpasswd 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/ogma-container:5.0.8-rc4
 ```
 
 You can now open <http://127.0.0.1:8080/ogma/latest/> to use the application, you will need to provide username and password used to generate the `htpasswd` file.
