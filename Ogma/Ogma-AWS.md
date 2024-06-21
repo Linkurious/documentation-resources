@@ -67,7 +67,7 @@ tar xf $(pwd)/* && find $(pwd) -maxdepth 1 -type f -delete
 Install the Helm chart:
 
 ```sh
-helm install ogma \
+helm upgrade --install ogma \
     --namespace ogma ./* \
     --set serviceAccount.create=false \
     --set serviceAccount.name=ogma
