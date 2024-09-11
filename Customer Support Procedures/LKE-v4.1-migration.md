@@ -138,11 +138,17 @@ We have updated our internal dependencies to new major releases to offer up to d
 
 ***Benefits:***
 
-- Enhanced Security
+Enhanced Security.
 
 ***Impacts:***
 
-- None
+As part of these security updates, the embedded Elasticsearch has been updated to v8.13.4.
+
+Due to this update, the data-sources that use the "Embedded Elasticsearch" search provider will have
+full-text search disabled, upon upgrading Linkurious.
+
+To re-enable full-text search, you will need to re-index the impacted data-sources. This can be done
+in one click from the data-source configuration page.
 
 # Dropped Support section
 
