@@ -119,7 +119,12 @@ def injectStructureInfoInsertInto(match, replace):
 
     assert headers, "Error while creating an Insert Statement, no table definition found for `%s`" % (last_header)
 
-    values = extractListOfValues(match.group("values"))
+    matched_values = match.group("values")
+    # JSON sanitize: double escape for special characters
+    if __dialect__ in ["mysql", "mariadb"]:
+        matched_values = matched_values.replace('\\"', '\\\\"')
+        matched_values = matched_values.replace('\\n', '\\\\n')
+    values = extractListOfValues(matched_values)    
     
     if headers[1]:
         for pos in headers[1]:
