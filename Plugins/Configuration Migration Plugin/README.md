@@ -194,6 +194,10 @@ Below the full list of configurations in scope:
 * **Query Templates** (service: `templates`, requires `custom_groups` and the configuration of a *Service Account*): not private Query Templates (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
   
   > If an existing Query Template is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
+
+* **Query Tags** (service: `tags`, requires the configuration of a *Service Account* with *Can create read-only queries and run queries* access rights): all query tags
+  > Queries that were assigned tags before the migration, will still have the same tags assigned after the migration.
+
 * **Custom Actions** (service: `custom_actions`, requires `custom_groups` and the configuration of a *Service Account*): not private Custom Actions (i.e. shared with everyone)
   
   > If an existing Custom Action is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
