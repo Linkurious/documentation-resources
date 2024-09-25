@@ -191,7 +191,7 @@ Below the full list of configurations in scope:
 * **Queries** (service: `queries`, requires `custom_groups` and the configuration of a *Service Account*): not private Static Queries (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
   
   > If an existing Static Query is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
-* **Query Templates** (service: `templates`, requires `custom_groups` and the configuration of a *Service Account*): not private Query Templates (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
+* **Query Templates** (service: `templates`, requires `custom_groups`, `tags` and the configuration of a *Service Account*): not private Query Templates (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
   
   > If an existing Query Template is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
 
