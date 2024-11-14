@@ -59,7 +59,7 @@ aws ecr get-login-password \
 
 mkdir linkurious-enterprise && cd linkurious-enterprise
 
-helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/lke-aws-hourly365 --version 0.2.6
+helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/lke-aws-hourly365 --version 0.2.7
 
 ```
 
@@ -67,7 +67,7 @@ Install the Helm chart:
 
 ```sh
 helm upgrade --install linkurious-enterprise \
-    --namespace linkurious-enterprise lke-aws-hourly365-0.2.6.tgz \
+    --namespace linkurious-enterprise lke-aws-hourly365-0.2.7.tgz \
     --set serviceAccount.create=false \
     --set serviceAccount.name=linkurious-enterprise
 ```
@@ -92,7 +92,7 @@ NOTES:
   export CONTAINER_PORT=$(kubectl get pod --namespace linkurious-enterprise $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
   echo "Visit http://127.0.0.1:8080/admin-manual/latest/ to use your application"
   kubectl --namespace linkurious-enterprise port-forward $POD_NAME 8080:$CONTAINER_PORT
-2. Please log in using username: "linkurious-enterprise" and password: "******".
+2. Please log in using username: "lke" and password: "******".
 ```
 
 These commands temporarily port-forwards from `localhost:8080` to `your-pod:8080`, meaning you can view the linkurious-enterprise user-interface at <http://localhost:8080/admin-manual/latest/> while these commands run.
@@ -110,7 +110,7 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 Pull the image:
 
 ```sh
-docker pull 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/linkurious-enterprise-hourly-container:5.0.8-rc4
+docker pull 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/lke-aws-hourly365-container:4.1.6-rc2
 ```
 
 ### Run the container
@@ -118,7 +118,7 @@ docker pull 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/linkurious-e
 You can now run the container, exposing port `8080` locally.
 
 ```sh
-docker run --rm -p8080:8080 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/linkurious-enterprise-hourly-container:5.0.8-rc4
+docker run --rm -p8080:8080 709825985650.dkr.ecr.us-east-1.amazonaws.com/linkurious/lke-aws-hourly365-container:4.1.6-rc2
 ```
 
 You can now open <http://127.0.0.1:8080/admin-manual/latest/> to use the application.
