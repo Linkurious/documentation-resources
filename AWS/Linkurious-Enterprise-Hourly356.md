@@ -88,7 +88,7 @@ Example output of the Helm install command:
 ```sh
 NOTES:
 1. Get the application URL by running these commands:
-  export POD_NAME=$(kubectl get pods --namespace linkurious-enterprise -l "app.kubernetes.io/name=linkurious-enterprise,app.kubernetes.io/instance=linkurious-enterprise" -o jsonpath="{.items[0].metadata.name}")
+  export POD_NAME=$(kubectl get pods --namespace linkurious-enterprise -l "app.kubernetes.io/name=lke-aws-hourly365,app.kubernetes.io/instance=linkurious-enterprise" -o jsonpath="{.items[0].metadata.name}")
   export CONTAINER_PORT=$(kubectl get pod --namespace linkurious-enterprise $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
   echo "Visit http://127.0.0.1:8080/admin-manual/latest/ to use your application"
   kubectl --namespace linkurious-enterprise port-forward $POD_NAME 8080:$CONTAINER_PORT
