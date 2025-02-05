@@ -10,7 +10,7 @@ Its use is recommended when you need to search for subparts of URL, emails, IPv6
 - strings are tokenized by splitting on non-alphanumerical characters (i.e. anything but a number or a letter);
 - text is converted to lowercase;
 - alphanumeric char sequences are considered as a single token;
-- No-ASCII characters are filtered and replaced by ASCII characters (e.g. [`é`, `è`, `ê`, `ë`] → `e`).
+- Non-ASCII characters are converted into the closest equivalent ASCII character (e.g. [`é`, `è`, `ê`, `ë`] → `e`).
 
 ## Usage:
 1. Download the `LinkuriousCustomAnalyzer-1.0.0.jar` file from this repository;
