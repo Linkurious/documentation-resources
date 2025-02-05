@@ -8,7 +8,7 @@ Its use is recommended when you need to search for subparts of URL, emails, IPv6
 
 ## Key Features:
 - strings are tokenized by splitting on non-alphanumerical characters (i.e. anything but a number or a letter);
-- strings are lowercased;
+- text is converted to lowercase;
 - alphanumeric char sequences are considered as a single token;
 - No-ASCII characters are filtered and replaced by ASCII characters (e.g. [`é`, `è`, `ê`, `ë`] → `e`).
 
