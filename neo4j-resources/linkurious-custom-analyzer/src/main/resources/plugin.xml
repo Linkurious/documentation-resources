@@ -1,0 +1,14 @@
+<plugin>
+    <id>com.linkurious.neo4jSearch.customAnalyzer</id>
+    <name>Linkurious Custom Analyzer for Neo4j Lucene Search</name>
+    <version>1.0.0</version>
+    <description>Custom Analyzer for Neo4j Lucene Search.</description>
+    <author>Linkurious</author>
+    <dependencies>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+            <version>4.4.0</version>
+        </dependency>
+    </dependencies>
+</plugin>
