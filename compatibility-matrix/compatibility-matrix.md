@@ -24,5 +24,5 @@
 [h]: https://mariadb.org/
 [i]: https://www.microsoft.com/en-us/sql-server/
 
-[^1]: [Incremental indexing](https://doc.linkurious.com/admin-manual/4.0/incremental-indexing/) on Neo4j 5.x clusters is supported only if Linkurious is 4.0.4 or higher and Neo4j is 5.4.0 or higher
+[^1]: [Incremental indexing](https://doc.linkurious.com/admin-manual/4.0/incremental-indexing/) on Neo4j 5.x clusters is supported only if Linkurious Enterprise is 4.0.4 or higher and Neo4j is 5.4.0 or higher
 [^2]: No support for [incremental indexing](https://doc.linkurious.com/admin-manual/4.0/incremental-indexing/) with Elasticsearch
