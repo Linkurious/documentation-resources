@@ -10,7 +10,6 @@ this document will provide you extra details of what you need to take care or do
 - [General major changes](#general-major-changes)
   - [Hardened cookie secrets](#hardened-cookie-secrets)
   - [Security updates](#security-updates)
-- [Dropped Support section](#dropped-support-section)
 
 # Requirements
 
@@ -56,11 +55,3 @@ full-text search disabled, upon upgrading Linkurious.
 
 To re-enable full-text search, you will need to re-index the impacted data-sources. This can be done
 in one click from the data-source configuration page.
-
-# Dropped Support section
-
-- Dropped support for legacy database vendors, check out the [new list][1]
-  - Impacted clients: everyone using old database vendors
-  - Remediation: verify the new support list and upgrade legacy database vendors accordingly
-
-[1]: https://github.com/Linkurious/documentation-resources/blob/master/compatibility-matrix/compatibility-matrix.md
