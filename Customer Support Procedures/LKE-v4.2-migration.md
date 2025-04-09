@@ -23,20 +23,21 @@ We strongly recommend backing-up your SQL database and your installation folder 
 
 ## Hardened cookie secrets
 
-In Linkurious v4.2, cookie secrets must be at least 32 character longs.
+In Linkurious v4.2, cookie secrets must be at least 64 character longs.
 
 ***Impacted clients:***
 
-Clients using a cookie secret shorter than 32 characters.
+Clients using a cookie secret shorter than 64 characters.
 
 ***Benefits:***
 
-Cookie secrets shorter than 32 characters are unsecure, enforcing longer secrets improves the security of the application.
+Cookie secrets shorter than 64 characters are unsecure, enforcing longer secrets improves the security of the application.
 
 ***Impacts:***
 
-If your configuration contains a `server.cookieSecret` value that is shorter than 32 characters,
-you must replace it with a longer value.
+If your configuration contains a `server.cookieSecret` value that is shorter than 64 characters,
+you must replace it with a longer value. Otherwise, it is going to be replaced automatically by a
+secure value upon the next Linkurious restart.
 
 ## Security updates
 
