@@ -55,11 +55,11 @@ See complete procedure on [Neo4j documentation](https://neo4j.com/docs/upgrade-m
 To improve database performances, Neo4j has implemented a new storage format (so called `block`)
 in v5.14 and made it the default setting for the new databases created in the Enterprise Edition since v5.17.
 
-> ![NOTE]
+> [!NOTE]
 > The storage format for existing databases is not automatically migrated to the new `block` format,
 > it requires a manual intervention.
 
-> ![CAUTION]
+> [!CAUTION]
 > The `block` format is not available on the Neo4j Community Edition (CE).
 > You can be impacted at any time in the feature if you plan an upgrade of an existing database
 > from the Neo4j Community Edition (CE) to the Neo4j Enterprise Edition (EE).
@@ -67,7 +67,7 @@ in v5.14 and made it the default setting for the new databases created in the En
 Despite the new format doesn't imply any side effect to Linkurious Enterprise (when used on a new db),
 the actual migration from an old format to the `block` format (on an existing db) will cause a change to the Neo4j internal IDs of the nodes and relationships ([source](https://neo4j.com/docs/operations-manual/current/database-internals/store-formats/#change-store-format)).
 
-> ![CAUTION]
+> [!CAUTION]
 > If the references (Neo4j internal IDs) used by Linkurious Enterprise to access data change,
 > the coherence of the visualizations and cases stored in Linkurious Enterprise is compromised
 > with a very high risk of seeing different information than what was originally saved.
