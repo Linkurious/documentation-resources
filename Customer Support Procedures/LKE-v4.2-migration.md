@@ -60,12 +60,11 @@ in one click from the data-source configuration page.
 
 ## Cluster Mode: Fault Tolerance enhancement
 
-We have reviewed the existing Fault Tolerance guidelines and made a new feature to better support
-in the configuration of a redundant infrastructure. The new feature is identified as [Cluster mode](https://doc.linkurious.com/admin-manual/latest/cluster-mode/).
+We have updated the existing Fault Tolerance guidelines and made a new feature to better support the setup of a redundant infrastructure. The new feature is identified as [Cluster mode](https://doc.linkurious.com/admin-manual/latest/cluster-mode/).
 
 ***Benefits:***
 
-* Enhanced system integrity via the new server role (`primary` vs `secondary`) to let the system automatically disable tasks that doesn't need to run concurrently
+* Enhanced system integrity via the new server role (`primary` vs `secondary`) to let the system automatically disable tasks that cannot run concurrently
   without the need of manual configurations
 * Enhanced architecture that allows having more than just a single extra backup node
   (despite the technical enablement, a dedicated license discussion is still needed for deploying multiple servers)
@@ -74,8 +73,8 @@ in the configuration of a redundant infrastructure. The new feature is identifie
 
 ***Impacts:***
 
-Despite there are no direct impacts on your existing setup, we changed our guidelines and introduced new configurations to use the new feature that requires manual intervention.
-If you have an old `Fault tolerance` implementation according to our [old documentation](https://doc.linkurious.com/admin-manual/4.1/faq/#how-can-fault-tolerance-be-achieved-), we suggest to implement the new [Cluster mode](https://doc.linkurious.com/admin-manual/latest/cluster-mode/) configurations.
+Despite the lack of direct impacts on existing `Fault Tolerance` setups, we changed our guidelines and introduced new configuration options that requires manual intervention to be enabled.
+If you have an old `Fault tolerance` implementation according to our [previous documentation](https://doc.linkurious.com/admin-manual/4.1/faq/#how-can-fault-tolerance-be-achieved-), we suggest you to migrate to the new [Cluster mode](https://doc.linkurious.com/admin-manual/latest/cluster-mode/).
 
 In particular, this would require to:
 1. Re-align the configurations between the 2 existing servers of the `Fault tolerance` implementation 
