@@ -35,7 +35,7 @@ The plugin manifest contains a minimum requirement for the Linkurious Enterprise
 
 ### Prerequisites
 
-- Linkurious Enterprise v4.0.25+
+- Linkurious Enterprise v4.2.0+
 - A connected data-source in Linkurious
 - A Linkurious Enterprise [*Service Account*](#service-account-recommendations) to be the owner of the new objects in the destination datasource
 
