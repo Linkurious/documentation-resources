@@ -61,7 +61,7 @@ in v5.14 and made it the default setting for the new databases created in the En
 
 > [!CAUTION]
 > The `block` format is not available on the Neo4j Community Edition (CE).
-> You can be impacted at any time in the feature if you plan an upgrade of an existing database
+> You can be impacted at any time in the future if you plan to upgrade an existing database
 > from the Neo4j Community Edition (CE) to the Neo4j Enterprise Edition (EE).
 
 The new `block` format is compatible with Linkurious Enterprise, but migrating an existing database to
