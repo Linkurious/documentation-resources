@@ -9,6 +9,7 @@ this document will provide you extra details of what you need to take care of in
 - [Pre-requisites and limitations](#pre-requisites-and-limitations)
 - [Issues with cypher queries](#issues-with-cypher-queries)
 - [Migrating databases](#migrating-databases)
+- [New block storage format](#new-block-storage-format)
 
 # Pre-requisites and limitations
 
@@ -48,3 +49,34 @@ has changed and display a warning about that. You can safely dismiss this warnin
 to fully reindex your data-source.
 
 See complete procedure on [Neo4j documentation](https://neo4j.com/docs/upgrade-migration-guide/current/version-5).
+
+# New block storage format
+
+To improve database performance, Neo4j has implemented a new storage format (so called `block`)
+in v5.14 and made it the default setting for the new databases created in the Enterprise Edition since v5.17.
+
+> [!NOTE]
+> The storage format for existing databases is not automatically migrated to the new `block` format,
+> it requires a manual intervention.
+
+> [!CAUTION]
+> The `block` format is not available on the Neo4j Community Edition (CE).
+> You can be impacted at any time in the future if you plan to upgrade an existing database
+> from the Neo4j Community Edition (CE) to the Neo4j Enterprise Edition (EE).
+
+The new `block` format is compatible with Linkurious Enterprise, but migrating an existing database to
+`block` format will cause changes to the Neo4j internal IDs of the nodes and relationships ([source](https://neo4j.com/docs/operations-manual/current/database-internals/store-formats/#change-store-format)).
+
+> [!CAUTION]
+> If the references (Neo4j internal IDs) used by Linkurious Enterprise to access data change,
+> the integrity of visualizations and cases stored in Linkurious Enterprise will be compromised,
+> causing the wrong nodes and relationships to be displayed as the content of these visualizations and cases.
+
+If you are already using [Alternative IDs](https://doc.linkurious.com/admin-manual/latest/alternative-ids/) in Linkurious Enterprise,
+you are not relying anymore on the Neo4j internal IDs and hence not impacted by this section.
+In this configuration you can safely perform the migration.
+
+If you are **NOT** using [Alternative IDs](https://doc.linkurious.com/admin-manual/latest/alternative-ids/) in Linkurious Enterprise
+**AND** you are planning to migrate to the `block` format
+**AND** you do not want to delete all existing visualizations and cases in Linkurious Enterprise,
+please [get in touch](https://doc.linkurious.com/admin-manual/latest/support/) to receive the appropriate support.
