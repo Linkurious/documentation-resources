@@ -87,5 +87,5 @@ In particular, this would require to:
 
 In Linkurious Enterprise 4.2.1, several [entity resolution](https://doc.linkurious.com/admin-manual/latest/entity-resolution/) bugs have been fixed.
 As a consequence, when updating to v4.2.1:
-- the entity resolution server must be updated
+- the entity resolution server must be updated to a version at least 1.1.0 or after
 - entity resolution must be purged
