@@ -82,3 +82,10 @@ In particular, this would require to:
 3. Change your load balancer / reverse proxy configuration to improve the load balancing policy:
    the `backup` configuration is not a requirement anymore, the `Sticky Sessions` is a requirement when distributing the requests
 4. Reach out to your CSM or SE if you need / plan to add new servers to your redundant environment
+
+## Entity Resolution
+
+In Linkurious Enterprise 4.2.1, several [entity resolution](https://doc.linkurious.com/admin-manual/latest/entity-resolution/) bugs have been fixed.
+As a consequence, when updating to v4.2.1:
+- the entity resolution server must be updated to a version at least 1.1.0 or after
+- entity resolution must be purged
