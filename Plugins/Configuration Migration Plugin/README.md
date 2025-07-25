@@ -48,20 +48,18 @@ Here an example of the configuration in the `Plugin settings` section of Linkuri
   "config-migration": [
     {
       "basePath:": "config-migration",
-      "saUsernameOrEmail": "username",
-      "saPassword": "********",
       "disableServices": ["queries", "templates", "custom_actions", "alerts"]
     }
   ]
 }
 ```
 
-* `saUsernameOrEmail` (optional): the `username` or `email` of an existing *Service Account* that will be used to perform any export and import activities. This parameter can be omitted when using only the 
+* `saUsernameOrEmail` (optional): the `username` or `email` of an existing *Service Account* that will be used to perform any export and import activities. This parameter can be omitted when performing the actions with the logged in account.
 * `saPassword` (optional): if not specified, the plugin will allow operations only when directly connected as the user specified in `saUsernameOrEmail`; if specified, it has to contain the password of the `saUsernameOrEmail` account for impersonation during export / import activities.
 * `enableServices` (optional): a list of services to activated for the import procedure (see [Data Migration scope](#data-migration-scope) for the list of accepted values); this is not usable in conjuction with `disableServices`.
 * `disableServices` (optional): a list of services to be disabled from the import procedure (see [Data Migration scope](#data-migration-scope) for the list of accepted values); this is not usable in conjuction with `enableServices`.
   
-> For ensuring file compatibility, chosing to activate only a subset of services will not impact the export procedure that is providing the same output regardless of this configuration.
+> For ensuring file compatibility, choosing to activate only a subset of services will not impact the export procedure that is providing the same output regardless of this configuration.
 
 Simplest configuration to only migrate the schema:
 ```json
@@ -80,13 +78,15 @@ Simplest configuration to only migrate the schema:
 
 ### Service Account Recommendations
 
-The *Service Account* will be used both for *export* and *import* activities.
-It could be different among the various instances, however it is suggested to reuse the same username (and possible different password) for an easier management.
+The *Service Account* is the user used both for export and import activities implying that:
+* any operation will be executed with the security permissions of the *Service Account*;
+* any change made to the system will be tracked with the name of the *Service Account* (e.g. when creating or updating a query the system will show: *updated by* and the reference of the *Service Account*).
 
-The *export* is restricted by security access to the item accessible from the *Service Account*.
-Because of this, the recommendation is to associate this account to the `Admin` built-in group and to every custom groups defined in the system.
-Consider also to share the configurations (queries, etc.) only with `Custom Groups` and not built-in group.
-Using this configuration avoids any problem related to access rights during the export phase.
+If the `saUsernameOrEmail` parameter is not specified (default configuration), the user connected to Linkurious Enterprise at the moment of the operation will be used as *Service Account*.
+
+While it is safe to not specify a *Service Account*, it could be helpful to specify one to differentiate in the system the activities done via this plugin versus the manual changes done by the admin user. In this configuration, the [Audit Trail](#audit-trail) of this plugin will still allow to identify the real user triggering the action.
+
+If a custom *Service Account* is configured, it could be different among the various instances, however it is suggested to reuse the same username (and possibly different passwords) for an easier management. The *Service Account* account should also have the correct access rights that by default requires the built-in *Admin* role, lower securities can be granted in case the plugin is configured to work on a limited [scope](#data-migration-scope).
 
 
 ## How to use the plugin
@@ -188,17 +188,15 @@ Below the full list of configurations in scope:
 * **Custom Groups** (service: `custom_groups`, requires `datasource` and `schema_nodes` and `schema_edges`): custom groups and all their securities definition, built-in groups are excluded since automatically created by the system
   
   > IDs of custom groups will be different from the one in the source system: possible impact on automatic group mapping of groups with external systems (manual configuration out of scope of this plugin)
-* **Queries** (service: `queries`, requires `custom_groups` and the configuration of a *Service Account*): not private Static Queries (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
+* **Queries** (service: `queries`, requires `custom_groups`): not private Static Queries (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
   
   > If an existing Static Query is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
-* **Query Templates** (service: `templates`, requires `custom_groups`, `tags` and the configuration of a *Service Account*): not private Query Templates (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
+* **Query with dynamic inputs** (service: `templates`, requires `custom_groups`, `tags`): not private Query with dynamic inputs (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
   
-  > If an existing Query Template is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
-
+  > If an existing Query with dynamic inputs is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
 * **Query Tags** (service: `tags`, requires the configuration of a *Service Account* with *Can create read-only queries and run queries* access rights): all query tags
   > Queries that were assigned tags before the migration, will still have the same tags assigned after the migration.
-
-* **Custom Actions** (service: `custom_actions`, requires `custom_groups` and the configuration of a *Service Account*): not private Custom Actions (i.e. shared with everyone)
+* **Custom Actions** (service: `custom_actions`, requires `custom_groups`): not private Custom Actions (i.e. shared with everyone)
   
   > If an existing Custom Action is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
 * **Alerts** (service: `alerts`, requires `custom_groups`): not private Alerts' definition, their models and their folder organization
