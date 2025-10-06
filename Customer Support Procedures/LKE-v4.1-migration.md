@@ -7,6 +7,7 @@ this document will provide you extra details of what you need to take care or do
 <!-- omit in toc -->
 # Table of contents
 - [Requirements](#requirements)
+- [Known issues](#known-issues)
 - [General major changes](#general-major-changes)
   - [Resources ownership](#resources-ownership)
   - [Simplified log configuration](#simplified-log-configuration)
@@ -21,6 +22,44 @@ Updating from Linkurious Enterprise v2.0 or older to v4.1 is not supported.
 If you are updating from Linkurious Enterprise v2.0 or older, please first update to v3.1 or v4.0 before updating to v4.1.
 
 We strongly recommend backing-up your SQL database and your installation folder before updating Linkurious Enterprise.
+
+# Known issues
+
+If your SQL database has been initially created on Linkurious Enterprise v2.7.0 or older, the
+upgrade to v4.1.10 or later is going to fail.
+
+The fix is to manually remove the `nodeTypes.count` and `edgeTypes.count` columns from the SQL
+database, before upgrading to v4.1.10 or later.
+
+## Drop the default constraints (SQL Server only)
+
+On SQL Server specifically, the default constraints on these columns must be explicitly dropped. To
+do so, first find the constraints in the object catalog views using the following query:
+
+```sql
+SELECT tab.name AS table_name, def.name AS default_constraint_name
+FROM sys.default_constraints AS def
+JOIN sys.all_columns AS col ON col.default_object_id = def.object_id
+JOIN sys.tables AS tab ON tab.object_id = col.object_id
+WHERE tab.name IN ('nodeTypes', 'edgeTypes')
+AND col.name = 'count'
+```
+
+For each returned result, execute the following query (replace the fields between angle brackets
+by the values of the result):
+
+```sql
+ALTER TABLE <table_name> DROP <default_constraint_name>;
+```
+
+## Drop the columns
+
+Then, the columns can be dropped using:
+
+```sql
+ALTER TABLE nodeTypes DROP COLUMN count;
+ALTER TABLE edgeTypes DROP COLUMN count;
+```
 
 # General major changes
 
