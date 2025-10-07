@@ -42,7 +42,7 @@ FROM sys.default_constraints AS def
 JOIN sys.all_columns AS col ON col.default_object_id = def.object_id
 JOIN sys.tables AS tab ON tab.object_id = col.object_id
 WHERE tab.name IN ('nodeTypes', 'edgeTypes')
-AND col.name = 'count'
+AND col.name = 'count';
 ```
 
 For each returned result, execute the following query (replace the fields between angle brackets
