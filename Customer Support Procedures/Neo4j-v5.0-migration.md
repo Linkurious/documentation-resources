@@ -78,5 +78,5 @@ In this configuration you can safely perform the migration.
 
 If you are **NOT** using [Alternative IDs](https://doc.linkurious.com/admin-manual/latest/alternative-ids/) in Linkurious Enterprise
 **AND** you are planning to migrate to the `block` format
-**AND** you do not want to delete all existing visualizations and cases in Linkurious Enterprise,
+**AND** you do not want to delete all existing visualizations and cases in Linkurious Enterprise, you can follow our [migration guidelines](https://doc.linkurious.com/admin-manual/latest/configure-neo4j/#migrating-to-neo4j-block-storage). In case of doubts or issues,
 please [get in touch](https://doc.linkurious.com/admin-manual/latest/support/) to receive the appropriate support.
