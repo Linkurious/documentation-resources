@@ -1,4 +1,4 @@
-@Library('linkurious-shared')_
+@Library('linkurious-shared@feature/OPS-2709')_
 
 dockerJob {
   // General
