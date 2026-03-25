@@ -1,9 +1,9 @@
 @Library('linkurious-shared@feature/OPS-2709')_
 
-dockerJob {
+nodeJob {
   // General
   projectName = "linkurious/documentation-resources"
-  podTemplateNames = ['jnlp-agent']
+  podTemplateNames = ['jnlp-agent-node']
   runLycheeCheck = true
 
   // Deployment
