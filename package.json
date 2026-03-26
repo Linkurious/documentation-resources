@@ -9,6 +9,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "build": "echo build"
+    "build": "echo build",
+    "test:unit": "mkdir -p reports/unit && lychee --offline --format junit --output reports/unit/junit-test-results.xml ." 
   }
 }
