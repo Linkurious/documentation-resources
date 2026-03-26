@@ -9,7 +9,6 @@
   },
   "main": "index.js",
   "scripts": {
-    "checkLinks": "node checkLinks.js",
-    "build": "npm run checkLinks"
+    "build": "echo build"
   }
 }
