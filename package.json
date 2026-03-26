@@ -1,6 +1,6 @@
 {
   "name": "documentation-resources",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "This repository is a container for the resources described in the [Linkurious Enterprise documentation](https://doc.linkurio.us/).",
   "private": true,
   "engines": {
