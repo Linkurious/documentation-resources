@@ -10,6 +10,6 @@
   "main": "index.js",
   "scripts": {
     "build": "echo build",
-    "test:unit": "mkdir -p reports/unit && lychee --offline --format junit --output reports/unit/junit-test-results.xml ." 
+    "test:unit": "jest --ci && mkdir -p reports/unit && lychee --offline --format junit --output reports/unit/junit-test-results.xml ." 
   }
 }
