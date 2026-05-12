@@ -36,7 +36,7 @@ In some cases you can get a communication issue after the upgrade, in other case
 
 1. Stop Linkurious Enterprise (more details on [our documentation](https://doc.linkurio.us/admin-manual/latest/stop/))
 1. Update Neo4j through the standard procedure (minimum supported version in Linkurious Enterprise is v4.0.2, check our [compatibility matrix](https://github.com/Linkurious/documentation-resources/blob/master/compatibility-matrix/compatibility-matrix.md))
-1. From the `production.json` file change the [datasource configurations]((https://doc.linkurio.us/admin-manual/latest/configure-neo4j/#configuration)) to use the suggested protocols for Neo4j v4 in the `url` parameter
+1. From the `production.json` file change the [datasource configurations](https://doc.linkurio.us/admin-manual/latest/configure-neo4j/#configuration) to use the suggested protocols for Neo4j v4 in the `url` parameter
    - In case of a Neo4j Standalone server or Cluster configuration use `neo4j://`
    - In case of a Neo4j Standalone server or Cluster configuration using the encrypted layer use `neo4j+s://`
 1. Start Linkurious Enterprise, if the system ask to re-index don’t do it at this stage
