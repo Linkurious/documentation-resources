@@ -1,0 +1,15 @@
+{
+  "name": "documentation-resources",
+  "version": "0.0.1",
+  "description": "This repository is a container for the resources described in the [Linkurious Enterprise documentation](https://doc.linkurio.us/).",
+  "private": true,
+  "engines": {
+    "node": "24.14.1",
+    "npm": "^11.6.1"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "echo build",
+    "test:unit": "mkdir -p reports/unit && lychee --offline --format junit --output reports/unit/junit-test-results.xml ." 
+  }
+}
