@@ -6,6 +6,7 @@
   - [Examples](#examples)
 
 - [**How to integrate plugins in Linkurious Enterprise?**](#how-to-integrate-plugins-in-linkurious-enterprise)
+  - [Managing plugins with the Plugins Manager](#managing-plugins-with-the-plugins-manager)
   - [Installing a plugin](#installing-a-plugin)
     - [Installing a plugin via docker](#installing-a-plugin-via-docker)
   - [Configuring a plugin](#configuring-a-plugin)
@@ -41,6 +42,7 @@
   - [Backend APIs](#backend-apis)
     - [Router, Request and Response interface](#router-request-and-response-interface)
     - [Interface of “options”](#interface-of-options)
+    - [Sending metadata to Linkurious Enterprise](#sending-metadata-to-linkurious-enterprise)
     - [Configuration validation](#configuration-validation)
     - [Configuration and secrets](#configuration-and-secrets)
     - [Audit trail](#audit-trail)
@@ -83,9 +85,28 @@ Here are examples of uses-cases that can be solved by developing a plugin:
 
 # How to integrate plugins in Linkurious Enterprise?
 
+## Managing plugins with the Plugins Manager
+
+Linkurious Enterprise provides a **Plugins Manager** page that lets administrators manage plugins directly from the Web interface, without having to edit configuration files or access the server’s file system.
+
+To open it, go to the administration area and select **Plugins manager** (e.g. [https://linkurious.example.com/admin/plugins-manager](https://linkurious.example.com/admin/plugins-manager)).
+
+From the Plugins Manager, an administrator can:
+
+- **Install a plugin** by uploading its “.LKE” package: drag and drop the file onto the upload area (or click to browse). The plugin is installed and started automatically once the upload completes.  
+- **Browse installed and suggested plugins**, and see the current state of each one (Running, Stopped, Disabled, or Error).  
+- **Configure a plugin** through a dedicated form (equivalent to editing the plugin’s entry in the [Plugin settings](#configuring-a-plugin) of the Global configuration).  
+- **Start, stop or restart** a plugin.  
+- **Uninstall** a plugin.  
+- **See the logs** of a plugin to troubleshoot issues (see [Writing to the plugin logs](#writing-to-the-plugin-logs)).
+
+The Plugins Manager is the recommended way to manage plugins. The rest of this section also documents the underlying mechanisms (configuration file, file system, APIs), which remain available for advanced or automated setups.
+
 ## Installing a plugin
 
-To install a plugin, you need to copy the “.LKE” file in the linkurious/data/plugins/ directory. This needs to be done by a person who has administrator access to the server where Linkurious Enterprise is installed.
+The simplest way to install a plugin is to upload its “.LKE” package from the [Plugins Manager](#managing-plugins-with-the-plugins-manager) page.
+
+Alternatively, you can install a plugin by copying the “.LKE” file in the linkurious/data/plugins/ directory. This needs to be done by a person who has administrator access to the server where Linkurious Enterprise is installed.
 
 Note: the name of a plugin is defined internally (in the [manifest file](#creating-the-manifest)) and does not depend on the name of the “.LKE” file itself.
 
@@ -102,7 +123,7 @@ LKE_PLUGINS='["data-table"]'
 Depending on the plugin you are integrating, the plugin might need to be configured before it can be used (e.g. maybe it needs an API Key to be defined).   
 The configuration can also be used to customize under which URL the plugin will be made available. By default, a plugin called “my-plugin” is deployed at https://linkurious.example.com/plugins/my-plugin/, but this can be changed.
 
-The plugins configuration is available in the general configuration of Linkurious Enterprise. See [how to edit the general configuration](https://doc.linkurio.us/admin-manual/latest/configure/). The plugins configuration is available under the “plugins”.
+You can configure a plugin directly from the [Plugins Manager](#managing-plugins-with-the-plugins-manager) page, using the plugin’s configuration form. The configuration is also available in the general configuration of Linkurious Enterprise. See [how to edit the general configuration](https://doc.linkurio.us/admin-manual/latest/configure/). The plugins configuration is available under the “plugins”.
 
 The section is a JSON object where each property is the configuration for a specific plugin. Only two parameters are defined by default:
 
@@ -156,7 +177,9 @@ Here is an example of how to configure several instances of a plugin called “d
 
 ## Checking the status of all plugins
 
-It is possible to read the status of all plugins through [Linkurious Enterprise’s plugin status API](https://doc.linkurio.us/server-sdk/2.9.0/apidoc/#api-Plugin-getPlugins).   
+The state of every plugin (Running, Stopped, Disabled, or Error) is displayed next to each plugin in the [Plugins Manager](#managing-plugins-with-the-plugins-manager) page.
+
+It is also possible to read the status of all plugins through [Linkurious Enterprise’s plugin status API](https://doc.linkurio.us/server-sdk/2.9.0/apidoc/#api-Plugin-getPlugins).   
 Just open this URL with your browser: https://linkurious.example.com**/api/admin/plugins** 
 
 This will return a JSON object with the status of all plugins:
@@ -180,6 +203,8 @@ This will return a JSON object with the status of all plugins:
 - "error-manifest": the plugin did not start because its manifest was invalid
 
 ## Restarting all plugins
+
+From the [Plugins Manager](#managing-plugins-with-the-plugins-manager) page, you can start, stop or restart an individual plugin using its actions.
 
 When saving the configuration of plugins through the Web interface (see [how to configure a plugin](#configuring-a-plugin)), pressing the “save” button actually updates the configuration and restarts all plugins.
 
@@ -630,7 +655,32 @@ The manifest file must contain the following fields:
   - **optional**  
   - type: undefined OR string OR Array of strings  
   - what: path(s) to route files within the plugin (paths are relative to manifest file)  
-  - example: “backend/routes.js”
+  - example: “backend/routes.js”  
+- **icon**  
+  - **optional**  
+  - type: undefined OR non-empty string  
+  - what: An icon for the plugin, displayed in the Linkurious Enterprise UI (e.g. in the plugins manager). It can be a URL or a [data URI](https://developer.mozilla.org/en-US/docs/Web/URI/Schemes/data) (e.g. a base64-encoded PNG).  
+  - example: “data:image/png;base64,iVBORw0KGgo…”  
+- **i18n**  
+  - **optional**  
+  - type: undefined OR object  
+  - what: Localized strings for the plugin, keyed by language code (e.g. “en”, “fr”, “ja”). Each language entry is an object with a “title” and a “description” string. These values are used to display the plugin name and description in the user’s language in the Linkurious Enterprise UI.  
+  - example:  
+
+    ```json
+    {
+      "en": {
+        "title": "Hello world",
+        "description": "A boilerplate of how to start Linkurious plugin development."
+      },
+      "fr": {
+        "title": "Hello world",
+        "description": "Un exemple de code pour se lancer dans le développement de plugins Linkurious."
+      }
+    }
+    ```
+
+Note: to keep a plugin compatible with older versions of Linkurious Enterprise (which validate the manifest strictly), the manifest content can be split over several files: the canonical “manifest.json” with the base fields supported by all versions, and a supplement file with newer fields. Linkurious Enterprise merges them when loading the plugin.
 
 Example manifest file: [https://github.com/Linkurious/lke-plugin-data-table/blob/master/manifest.json](https://github.com/Linkurious/lke-plugin-data-table/blob/master/manifest.json) 
 
@@ -710,6 +760,7 @@ interface PluginOptions<PluginConfig extends BasePluginConfig> {
   router: express.Router;
   configuration: PluginConfig;
   getRestClient: (req: express.Request) => RestClient;
+  parentProcess: PluginParentProcess;
 }
 ```
 
@@ -717,7 +768,57 @@ Details:
 
 - **“router”** contains an express.js Router object.  
 - **“configuration”** contains the configuration of the current plugin, as defined in the “Plugin settings” section of the Global configuration of Linkurious Enterprise.  
-- **“getRestClient()”** is a method that returns a [REST Client instance](https://github.com/Linkurious/linkurious-rest-client/blob/master/src/index.ts#L30). The returned “RestClient” object can be used to directly send requests to Linkurious Enterprise’s REST API. See [how to use Linkurious Enterprise’s REST API](#using-the-linkurious-enterprise-api) for details.
+- **“getRestClient()”** is a method that returns a [REST Client instance](https://github.com/Linkurious/linkurious-rest-client/blob/master/src/index.ts#L30). The returned “RestClient” object can be used to directly send requests to Linkurious Enterprise’s REST API. See [how to use Linkurious Enterprise’s REST API](#using-the-linkurious-enterprise-api) for details.  
+- **“parentProcess”** is a handle to communicate with the parent process (the main Linkurious Enterprise server). It is used to send plugin metadata, such as plugin actions, back to Linkurious Enterprise. See [Sending metadata to Linkurious Enterprise](#sending-metadata-to-linkurious-enterprise) for details.
+
+### Sending metadata to Linkurious Enterprise
+
+A plugin can send metadata back to the main Linkurious Enterprise process through the “parentProcess” object injected in the backend options. This is currently used to declare **plugin actions**: entries that are surfaced in the Linkurious Enterprise UI (similar to [custom actions](#opening-a-plugin-using-custom-actions)) and that open a URL, relative to the plugin’s base path, when triggered.
+
+Metadata is sent by calling “parentProcess.postMetadata()”. This should be done at least once each time the plugin starts (metadata is **not** persisted between restarts), and again whenever the metadata changes.
+
+Here is the TypeScript interface of the “parentProcess” object and the metadata it accepts:
+
+```typescript
+// handle to communicate with the parent process
+interface PluginParentProcess {
+  postMetadata(metadata: PluginMetadata): void;
+}
+// the metadata a plugin can expose to Linkurious Enterprise
+interface PluginMetadata {
+  actions: PluginAction[];
+}
+// an action exposed by a plugin to Linkurious users
+interface PluginAction {
+  // a human readable name identifying the action
+  name: string;
+  // the URL template invoked by the action, relative to the plugin's base path.
+  // It uses the same syntax as a custom action URL template.
+  urlTemplate: string;
+  // an optional data-source key this action is scoped to.
+  // If undefined, the action is available for any data-source.
+  sourceKey?: string;
+  // who can access this action: admins only ("admin") or all authenticated users ("*")
+  access: 'admin' | '*';
+}
+```
+
+Here is an example of a backend file that registers a single plugin action:
+
+```javascript
+module.exports = function(options) {
+  // register one or more plugin actions with the host process
+  options.parentProcess.postMetadata({
+    actions: [
+      {
+        name: "Hello world",
+        urlTemplate: "/",
+        access: "*"
+      }
+    ]
+  });
+};
+```
 
 ### Configuration validation
 
