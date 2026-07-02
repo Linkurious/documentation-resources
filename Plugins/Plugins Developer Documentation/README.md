@@ -94,7 +94,7 @@ To open it, go to the administration area and select **Plugins manager** (e.g. [
 
 From the Plugins Manager, an administrator can:
 
-- **Install a plugin** by uploading its “.LKE” package: drag and drop the file onto the upload area (or click to browse). The plugin is installed and started automatically once the upload completes. This capability is **not available by default** and must be explicitly enabled with the `LKE_PLUGINS_ENABLE_UPLOAD` environment variable (see [Enabling plugin installation from the Web interface](#enabling-plugin-installation-from-the-web-interface)).  
+- **Install a plugin** by uploading its ".LKE" package: drag and drop the file onto the upload area (or click to browse). The plugin is installed and started automatically once the upload completes. This capability is **not available by default** and must be explicitly enabled with the `LKE_PLUGINS_ENABLE_UPLOAD` environment variable (see [Enabling plugin installation from the Web interface](#enabling-plugin-installation-from-the-web-interface)).  
 - **Browse installed and suggested plugins**, and see the current state of each one (Running, Stopped, Disabled, or Error).  
 - **Configure a plugin** through a dedicated form (equivalent to editing the plugin’s entry in the [Plugin settings](#configuring-a-plugin) of the Global configuration).  
 - **Start, stop or restart** a plugin.  
@@ -136,8 +136,9 @@ The configuration can also be used to customize under which URL the plugin will 
 
 You can configure a plugin directly from the [Plugins Manager](#managing-plugins-with-the-plugins-manager) page, using the plugin's configuration form. The configuration is also available in the general configuration of Linkurious Enterprise. See [how to edit the general configuration](https://doc.linkurio.us/admin-manual/latest/configure/). The plugins configuration is available under the "plugins" section.
 
-The section is a JSON object where each property is the configuration for a specific plugin. Only two parameters are defined by default:
+The section is a JSON object where each property is the configuration for a specific plugin. The following parameters are defined by default:
 
+* **disabled**: Optional parameter to disable the plugin (defaults to `false`). When set to `true`, the plugin instance is not started.  
 * **basePath**: Optional parameter to identify the route of the plugin (defaults to the plugin name)  
 * **debugPort**: Optional parameter to identify the debug port of the plugin to connect an external debugger (see [How to debug a plugin](#debugging-a-plugin)). It could be expressed as a number (e.g. 9229) or as a string representing the binding address in case of multiple IPs on the server (e.g. x.x.x.x:9229, or 0.0.0.0:9229 to bind on all)
 
@@ -773,7 +774,8 @@ Here is a formal [TypeScript](https://www.typescriptlang.org/) interface of the 
 ```typescript
 // a basic plugin configuration
 interface PluginConfig {
-  basePath?: string;
+  disabled?: boolean;
+  basePath: string;
   debugPort?: number;
 }
 
@@ -786,18 +788,17 @@ interface PluginRouteOptions<C extends PluginConfig = PluginConfig> {
 }
 ```
 
-Note: you don't need to redefine these types in your plugin source code. They are exported by the [`@linkurious/rest-client`](https://www.npmjs.com/package/@linkurious/rest-client) package (the options type is exported as `PluginRouteOptions`, along with `PluginParentProcess`, `PluginMetadata` and `PluginAction`), so you can import them directly.
-
 Details:
-
-- `router` contains an express.js Router object.  
-- `configuration` contains the configuration of the current plugin, as defined in the “Plugin settings” section of the Global configuration of Linkurious Enterprise.  
-- `getRestClient()` is a method that returns a [REST Client instance]). The returned `RestClient` object can be used to directly send requests to Linkurious Enterprise’s REST API. See [how to use Linkurious Enterprise’s REST API](#using-the-linkurious-enterprise-api) for details.  
 - `parentProcess` is a handle to communicate with the parent process (the main Linkurious Enterprise server). It is used to send plugin metadata, such as plugin actions, back to Linkurious Enterprise. See [Sending metadata to Linkurious Enterprise](#sending-metadata-to-linkurious-enterprise) for details.
+- `router` contains an express.js Router object.  
+- `configuration` contains the configuration of the current plugin, as defined in the "Plugin settings" section of the Global configuration of Linkurious Enterprise.  
+- `getRestClient()` is a method that returns a REST Client instance. The returned `RestClient` object can be used to directly send requests to Linkurious Enterprise’s REST API. See [how to use Linkurious Enterprise’s REST API](#using-the-linkurious-enterprise-api) for details.  
+
+Note: you don't need to redefine these types in your plugin source code. They are exported by the [`@linkurious/rest-client`](https://www.npmjs.com/package/@linkurious/rest-client) package (the options type is exported as `PluginRouteOptions`, along with `PluginParentProcess`, `PluginMetadata` and `PluginAction`), so you can import them directly.
 
 ### Sending metadata to Linkurious Enterprise
 
-A plugin can send metadata back to the main Linkurious Enterprise process through the “parentProcess” object injected in the backend options. This is currently used to declare **plugin actions**: entries that are surfaced in the Linkurious Enterprise UI (similar to [custom actions](#opening-a-plugin-using-custom-actions)) and that open a URL, relative to the plugin’s base path, when triggered.
+A plugin can send metadata back to the main Linkurious Enterprise process through the "parentProcess" object injected in the backend options. This is currently used to declare **plugin actions**: entries that are surfaced in the Linkurious Enterprise UI (similar to [custom actions](#opening-a-plugin-using-custom-actions)) and that open a URL, relative to the plugin’s base path, when triggered.
 
 Note: unlike a [custom action](#opening-a-plugin-using-custom-actions) URL template (which must start with `{{baseURL}}`), a plugin action's `urlTemplate` is resolved **relative to the plugin's base path**. You should not prepend `{{baseURL}}`: a value of `/` points to the plugin's own home page, and `/my-page` points to a page under the plugin. The rest of the template syntax (e.g. `{{(node:Person).dateOfBirth}}`) is the same as for custom actions.
 
