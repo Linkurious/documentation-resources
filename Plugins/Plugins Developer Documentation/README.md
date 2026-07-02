@@ -7,6 +7,7 @@
 
 - [**How to integrate plugins in Linkurious Enterprise?**](#how-to-integrate-plugins-in-linkurious-enterprise)
   - [Managing plugins with the Plugins Manager](#managing-plugins-with-the-plugins-manager)
+    - [Enabling plugin installation from the Web interface](#enabling-plugin-installation-from-the-web-interface)
   - [Installing a plugin](#installing-a-plugin)
     - [Installing a plugin via docker](#installing-a-plugin-via-docker)
   - [Configuring a plugin](#configuring-a-plugin)
@@ -93,7 +94,7 @@ To open it, go to the administration area and select **Plugins manager** (e.g. [
 
 From the Plugins Manager, an administrator can:
 
-- **Install a plugin** by uploading its “.LKE” package: drag and drop the file onto the upload area (or click to browse). The plugin is installed and started automatically once the upload completes.  
+- **Install a plugin** by uploading its “.LKE” package: drag and drop the file onto the upload area (or click to browse). The plugin is installed and started automatically once the upload completes. This capability is **not available by default** and must be explicitly enabled with the `LKE_PLUGINS_ENABLE_UPLOAD` environment variable (see [Enabling plugin installation from the Web interface](#enabling-plugin-installation-from-the-web-interface)).  
 - **Browse installed and suggested plugins**, and see the current state of each one (Running, Stopped, Disabled, or Error).  
 - **Configure a plugin** through a dedicated form (equivalent to editing the plugin’s entry in the [Plugin settings](#configuring-a-plugin) of the Global configuration).  
 - **Start, stop or restart** a plugin.  
@@ -101,6 +102,16 @@ From the Plugins Manager, an administrator can:
 - **See the logs** of a plugin to troubleshoot issues (see [Writing to the plugin logs](#writing-to-the-plugin-logs)).
 
 The Plugins Manager is the recommended way to manage plugins. The rest of this section also documents the underlying mechanisms (configuration file, file system, APIs), which remain available for advanced or automated setups.
+
+### Enabling plugin installation from the Web interface
+
+Installing a plugin by uploading its `.LKE` package from the Plugins Manager is **disabled by default**. To enable it, set the following environment variable on the Linkurious Enterprise server before starting it:
+
+```bash
+LKE_PLUGINS_ENABLE_UPLOAD=true
+```
+
+When this variable is not set (or not set to `true`), the upload area is not available and plugins can only be installed through the alternative mechanisms described in [Installing a plugin](#installing-a-plugin).
 
 ## Installing a plugin
 
@@ -177,9 +188,9 @@ Here is an example of how to configure several instances of a plugin called "dat
 
 ## Checking the status of all plugins
 
-The state of every plugin (Running, Stopped, Disabled, or Error) is displayed next to each plugin in the [Plugins Manager](#managing-plugins-with-the-plugins-manager) page.
+The state of every plugin instance (Running, Stopped, Disabled, or Error) is displayed next to each plugin in the [Plugins Manager](#managing-plugins-with-the-plugins-manager) page.
 
-It is also possible to read the status of all plugins through [Linkurious Enterprise's plugin status API](https://doc.linkurio.us/server-sdk/4.3.7/apidoc/#api-Plugin-getPlugins).   
+It is also possible to read the status of all plugins through [Linkurious Enterprise's plugin status API](https://doc.linkurio.us/server-sdk/latest/apidoc/#api-Plugin-getPlugins).   
 Just open this URL with your browser: https://linkurious.example.com**/api/admin/plugins** 
 
 This will return a JSON object with the status of all plugins:
@@ -230,6 +241,12 @@ This means that:
 - the custom action will be available only on nodes of type "Person"
 - when clicking on the custom action, a new browser tab will be open at the address defined by the custom actions URL template  
 - to build the address, `{{baseURL}}` will be replaced with the address of Linkurious Enterprise, and {{(node:Person).dateOfBirth}} will be replaced by the value of the "dateOfBirth" property on the currently selected node.
+
+By default, the action opens in a new browser tab. If you want it to open **as a modal inside Linkurious Enterprise** (in an embedded iframe) instead, add the `#linkurious-modal` hash at the end of the URL template, e.g.:
+
+```
+{{baseURL}}plugins/age/?date={{(node:Person).dateOfBirth}}#linkurious-modal
+```
 
 Here is an example of a custom action being used: [https://www.loom.com/share/dab052340731480096dac9580cdca4f9](https://www.loom.com/share/dab052340731480096dac9580cdca4f9)
 
@@ -660,11 +677,13 @@ The manifest file must contain the following fields:
   - example: `backend/routes.js`  
 - **icon**  
   - **optional**  
+  - since: 4.3.6  
   - type: undefined OR non-empty string  
   - what: An icon for the plugin, displayed in the Linkurious Enterprise UI (e.g. in the plugins manager). It can be a URL or a [data URI](https://developer.mozilla.org/en-US/docs/Web/URI/Schemes/data) (e.g. a base64-encoded PNG).  
   - example: `data:image/png;base64,iVBORw0KGgo…`  
 - **i18n**  
   - **optional**  
+  - since: 4.3.6  
   - type: undefined OR object  
   - what: Localized strings for the plugin, keyed by language code (e.g. "en", "fr", "ja"). Each language entry is an object with a "title" and a "description" string. These values are used to display the plugin name and description in the user's language in the Linkurious Enterprise UI.  
   - example:
@@ -681,7 +700,9 @@ The manifest file must contain the following fields:
     }
     ```
 
-Note: to keep a plugin compatible with older versions of Linkurious Enterprise (which validate the manifest strictly), the manifest content can be split over several files: the canonical `manifest.json` with the base fields supported by all versions, and a supplement file with newer fields. Linkurious Enterprise merges them when loading the plugin.
+Note: fields without a "since" value are supported by all versions of Linkurious Enterprise; fields with a "since" value (e.g. 4.3.6) are newer additions.
+
+To keep a plugin compatible with older versions of Linkurious Enterprise (which validate the manifest strictly), the manifest content can be split over several files: the canonical `manifest.json` with the base fields supported by all versions (those without a "since" value), and a supplement file with the newer fields (those with a "since" value). Linkurious Enterprise merges them when loading the plugin.
 
 Example manifest file: [https://github.com/Linkurious/lke-plugin-data-table/blob/master/manifest.json](https://github.com/Linkurious/lke-plugin-data-table/blob/master/manifest.json) 
 
@@ -751,29 +772,36 @@ Here is a formal [TypeScript](https://www.typescriptlang.org/) interface of the 
 
 ```typescript
 // a basic plugin configuration
-interface BasePluginConfig {
+interface PluginConfig {
   basePath?: string;
   debugPort?: number;
 }
+
 // interface of the "options" object
-interface PluginOptions<PluginConfig extends BasePluginConfig> {
-  router: express.Router;
-  configuration: PluginConfig;
-  getRestClient: (req: express.Request) => RestClient;
+interface PluginRouteOptions<C extends PluginConfig = PluginConfig> {
   parentProcess: PluginParentProcess;
+  router: express.Router;
+  configuration: C;
+  getRestClient: (req: express.Request) => RestClient;
 }
 ```
+
+Note: you don't need to redefine these types in your plugin source code. They are exported by the [`@linkurious/rest-client`](https://www.npmjs.com/package/@linkurious/rest-client) package (the options type is exported as `PluginRouteOptions`, along with `PluginParentProcess`, `PluginMetadata` and `PluginAction`), so you can import them directly.
 
 Details:
 
 - `router` contains an express.js Router object.  
 - `configuration` contains the configuration of the current plugin, as defined in the “Plugin settings” section of the Global configuration of Linkurious Enterprise.  
-- `getRestClient()` is a method that returns a [REST Client instance](https://github.com/Linkurious/linkurious-rest-client/blob/master/src/index.ts#L30). The returned `RestClient` object can be used to directly send requests to Linkurious Enterprise’s REST API. See [how to use Linkurious Enterprise’s REST API](#using-the-linkurious-enterprise-api) for details.  
+- `getRestClient()` is a method that returns a [REST Client instance]). The returned `RestClient` object can be used to directly send requests to Linkurious Enterprise’s REST API. See [how to use Linkurious Enterprise’s REST API](#using-the-linkurious-enterprise-api) for details.  
 - `parentProcess` is a handle to communicate with the parent process (the main Linkurious Enterprise server). It is used to send plugin metadata, such as plugin actions, back to Linkurious Enterprise. See [Sending metadata to Linkurious Enterprise](#sending-metadata-to-linkurious-enterprise) for details.
 
 ### Sending metadata to Linkurious Enterprise
 
 A plugin can send metadata back to the main Linkurious Enterprise process through the “parentProcess” object injected in the backend options. This is currently used to declare **plugin actions**: entries that are surfaced in the Linkurious Enterprise UI (similar to [custom actions](#opening-a-plugin-using-custom-actions)) and that open a URL, relative to the plugin’s base path, when triggered.
+
+Note: unlike a [custom action](#opening-a-plugin-using-custom-actions) URL template (which must start with `{{baseURL}}`), a plugin action's `urlTemplate` is resolved **relative to the plugin's base path**. You should not prepend `{{baseURL}}`: a value of `/` points to the plugin's own home page, and `/my-page` points to a page under the plugin. The rest of the template syntax (e.g. `{{(node:Person).dateOfBirth}}`) is the same as for custom actions.
+
+Note: as with custom actions, appending the `#linkurious-modal` hash to the `urlTemplate` opens the action as a modal inside Linkurious Enterprise (in an embedded iframe) instead of a new browser tab, e.g. `/my-page#linkurious-modal`.
 
 Metadata is sent by calling `parentProcess.postMetadata()`. This should be done at least once each time the plugin starts (metadata is **not** persisted between restarts), and again whenever the metadata changes.
 
