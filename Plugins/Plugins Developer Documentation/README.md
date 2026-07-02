@@ -6,6 +6,8 @@
   - [Examples](#examples)
 
 - [**How to integrate plugins in Linkurious Enterprise?**](#how-to-integrate-plugins-in-linkurious-enterprise)
+  - [Managing plugins with the Plugins Manager](#managing-plugins-with-the-plugins-manager)
+    - [Enabling plugin installation from the Web interface](#enabling-plugin-installation-from-the-web-interface)
   - [Installing a plugin](#installing-a-plugin)
     - [Installing a plugin via docker](#installing-a-plugin-via-docker)
   - [Configuring a plugin](#configuring-a-plugin)
@@ -41,6 +43,7 @@
   - [Backend APIs](#backend-apis)
     - [Router, Request and Response interface](#router-request-and-response-interface)
     - [Interface of "options"](#interface-of-options)
+    - [Sending metadata to Linkurious Enterprise](#sending-metadata-to-linkurious-enterprise)
     - [Configuration validation](#configuration-validation)
     - [Configuration and secrets](#configuration-and-secrets)
     - [Audit trail](#audit-trail)
@@ -52,9 +55,9 @@
     - [RestClient reference](#restclient-reference)
 
 - [**Debugging a plugin**](#debugging-a-plugin)
-    - [Debugging the Backend Code](#debugging-the-backend-code)
-    - [Debugging the Frontend Code](#debugging-the-frontend-code)
-    - [Working with a frontend development server](#working-with-a-frontend-development-server)
+  - [Debugging the Backend Code](#debugging-the-backend-code)
+  - [Debugging the Frontend Code](#debugging-the-frontend-code)
+  - [Working with a frontend development server](#working-with-a-frontend-development-server)
 
 # What are plugins?
 
@@ -62,30 +65,59 @@ Plugins are ways for developers to add **custom pages** and **custom APIs** to L
 
 Here are some plugin facts:
 
-- A plugin is a Web application hosted within Linkurious Enterprise  
-- Users need to be authenticated with Linkurious Enterprise to access installed plugins  
-- Each plugin has its own URL (e.g. https://linkurious.example.com/plugins/my-plugin/)   
-- A plugin can add one or more custom Web pages under its URL  
+- A plugin is a Web application hosted within Linkurious Enterprise
+- Users need to be authenticated with Linkurious Enterprise to access installed plugins
+- Each plugin has its own URL (e.g. https://linkurious.example.com/plugins/my-plugin/)
+- A plugin can add one or more custom Web pages under its URL
 - A plugin can add custom APIs, which are implemented as a Node.js application
 
 ## Examples
 
 Here are examples of uses-cases that can be solved by developing a plugin:
 
-1. Display the details of a company using companieshouse.gov.uk  
-   1. The plugin would add a new page in Linkurious Enterprise taking as parameter a company name (e.g. https://example.com/plugins/company?name=facebook+uk)   
-   2. The plugin would read the "name" parameter from its page, send a search query to beta.companieshouse.gov.uk to resolve the best match for the given company name (e.g. by calling [https://beta.companieshouse.gov.uk/search/companies?q=facebook+uk](https://beta.companieshouse.gov.uk/search/companies?q=facebook+uk)) and select the company code for the first search result.  
-   3. The plugin would then read the company details for the resolved company code (e.g. by calling [https://beta.companieshouse.gov.uk/company/06331310](https://beta.companieshouse.gov.uk/company/06331310)) and display the data in a custom manner.  
-2. Check if a Customer is on a watchlist using an internal CSV file  
-   1. The plugin would add a new page in Linkurious Enterprise taking as parameter a person's social security number (e.g. https://example.com/plugins/watchlist?ssn=123)  
-   2. The plugin would call an internal API (e.g. https://example.com/plugins/watchlist/api?ssn=123) to check if the SSN is on a watchlist. The API is part of the plugin and can use whatever method to check the input SSN against a list of SSN is a watchlist file stored internally as a CSV file.  
+1. Display the details of a company using companieshouse.gov.uk
+   1. The plugin would add a new page in Linkurious Enterprise taking as parameter a company name (e.g. https://example.com/plugins/company?name=facebook+uk)
+   2. The plugin would read the "name" parameter from its page, send a search query to beta.companieshouse.gov.uk to resolve the best match for the given company name (e.g. by calling [https://beta.companieshouse.gov.uk/search/companies?q=facebook+uk](https://beta.companieshouse.gov.uk/search/companies?q=facebook+uk)) and select the company code for the first search result.
+   3. The plugin would then read the company details for the resolved company code (e.g. by calling [https://beta.companieshouse.gov.uk/company/06331310](https://beta.companieshouse.gov.uk/company/06331310)) and display the data in a custom manner.
+2. Check if a Customer is on a watchlist using an internal CSV file
+   1. The plugin would add a new page in Linkurious Enterprise taking as parameter a person's social security number (e.g. https://example.com/plugins/watchlist?ssn=123)
+   2. The plugin would call an internal API (e.g. https://example.com/plugins/watchlist/api?ssn=123) to check if the SSN is on a watchlist. The API is part of the plugin and can use whatever method to check the input SSN against a list of SSN is a watchlist file stored internally as a CSV file.
    3. The plugin would then display the fact that the provided SSN is on a watchlist in its custom page.
 
 # How to integrate plugins in Linkurious Enterprise?
 
+## Managing plugins with the Plugins Manager
+
+Linkurious Enterprise provides a **Plugins Manager** page that lets administrators manage plugins directly from the Web interface, without having to edit configuration files or access the server’s file system.
+
+To open it, go to the administration area and select **Plugins manager** (e.g. [https://linkurious.example.com/admin/plugins-manager](https://linkurious.example.com/admin/plugins-manager)).
+
+From the Plugins Manager, an administrator can:
+
+- **Install a plugin** by uploading its ".LKE" package: drag and drop the file onto the upload area (or click to browse). The plugin is installed and started automatically once the upload completes. This capability is **not available by default** and must be explicitly enabled with the `LKE_PLUGINS_ENABLE_UPLOAD` environment variable (see [Enabling plugin installation from the Web interface](#enabling-plugin-installation-from-the-web-interface)).
+- **Browse installed and suggested plugins**, and see the current state of each one (Running, Stopped, Disabled, or Error).
+- **Configure a plugin** through a dedicated form (equivalent to editing the plugin’s entry in the [Plugin settings](#configuring-a-plugin) of the Global configuration).
+- **Start, stop or restart** a plugin.
+- **Uninstall** a plugin.
+- **See the logs** of a plugin to troubleshoot issues (see [Writing to the plugin logs](#writing-to-the-plugin-logs)).
+
+The Plugins Manager is the recommended way to manage plugins. The rest of this section also documents the underlying mechanisms (configuration file, file system, APIs), which remain available for advanced or automated setups.
+
+### Enabling plugin installation from the Web interface
+
+Installing a plugin by uploading its `.LKE` package from the Plugins Manager is **disabled by default**. To enable it, set the following environment variable on the Linkurious Enterprise server before starting it:
+
+```bash
+LKE_PLUGINS_ENABLE_UPLOAD=true
+```
+
+When this variable is not set (or not set to `true`), the upload area is not available and plugins can only be installed through the alternative mechanisms described in [Installing a plugin](#installing-a-plugin).
+
 ## Installing a plugin
 
-To install a plugin, you need to copy the `.LKE` file in the linkurious/data/plugins/ directory. This needs to be done by a person who has administrator access to the server where Linkurious Enterprise is installed.
+The simplest way to install a plugin is to upload its `.LKE` package from the [Plugins Manager](#managing-plugins-with-the-plugins-manager) page.
+
+Alternatively, you can install a plugin by copying the `.LKE` file in the `linkurious/data/plugins/` directory. This needs to be done by a person who has administrator access to the server where Linkurious Enterprise is installed.
 
 Note: the name of a plugin is defined internally (in the [manifest file](#creating-the-manifest)) and does not depend on the name of the `.LKE` file itself.
 
@@ -99,15 +131,16 @@ LKE_PLUGINS='["data-table"]'
 
 ## Configuring a plugin
 
-Depending on the plugin you are integrating, the plugin might need to be configured before it can be used (e.g. maybe it needs an API Key to be defined).   
+Depending on the plugin you are integrating, the plugin might need to be configured before it can be used (e.g. maybe it needs an API Key to be defined).  
 The configuration can also be used to customize under which URL the plugin will be made available. By default, a plugin called "my-plugin" is deployed at https://linkurious.example.com/plugins/my-plugin/, but this can be changed.
 
-The plugins configuration is available in the general configuration of Linkurious Enterprise. See [how to edit the general configuration](https://doc.linkurio.us/admin-manual/latest/configure/). The plugins configuration is available under the "plugins".
+You can configure a plugin directly from the [Plugins Manager](#managing-plugins-with-the-plugins-manager) page, using the plugin's configuration form. The configuration is also available in the general configuration of Linkurious Enterprise. See [how to edit the general configuration](https://doc.linkurio.us/admin-manual/latest/configure/). The plugins configuration is available under the "plugins" section.
 
-The section is a JSON object where each property is the configuration for a specific plugin. Only two parameters are defined by default:
+The section is a JSON object where each property is the configuration for a specific plugin. The following parameters are defined by default:
 
-* **basePath**: Optional parameter to identify the route of the plugin (defaults to the plugin name)  
-* **debugPort**: Optional parameter to identify the debug port of the plugin to connect an external debugger (see [How to debug a plugin](#debugging-a-plugin)). It could be expressed as a number (e.g. 9229) or as a string representing the binding address in case of multiple IPs on the server (e.g. x.x.x.x:9229, or 0.0.0.0:9229 to bind on all)
+- **disabled**: Optional parameter to disable the plugin (defaults to `false`). When set to `true`, the plugin instance is not started.
+- **basePath**: Optional parameter to identify the route of the plugin (defaults to the plugin name)
+- **debugPort**: Optional parameter to identify the debug port of the plugin to connect an external debugger (see [How to debug a plugin](#debugging-a-plugin)). It could be expressed as a number (e.g. 9229) or as a string representing the binding address in case of multiple IPs on the server (e.g. x.x.x.x:9229, or 0.0.0.0:9229 to bind on all)
 
 Some plugins also have plugin-specific configuration fields (these values are passed to the plugin backend at initialization time, see [how to read the plugin configuration](#interface-of-options)).
 
@@ -126,10 +159,10 @@ Here is an example of how to configure a plugin called "data-table":
 
 This is how this configuration will be interpreted:
 
-* This configuration will deploy one instance of the plugin called "data-table".  
-* "basePath" set to "my-custom-path" will make the instance of the plugin available under the following URL: http://linkurious.example.com/plugins/my-custom-path. Leaving "basePath" unset would have made the plugin available at http://linkurious.example.com/plugins/data-table.   
-* "debugPort" set to 9229 enables remote debugging on the port 9229.  
-* two custom configuration fields are defined ("entityType" and "itemType") and passed to the plugin.
+- This configuration will deploy one instance of the plugin called "data-table".
+- "basePath" set to "my-custom-path" will make the instance of the plugin available under the following URL: http://linkurious.example.com/plugins/my-custom-path. Leaving "basePath" unset would have made the plugin available at http://linkurious.example.com/plugins/data-table.
+- "debugPort" set to 9229 enables remote debugging on the port 9229.
+- two custom configuration fields are defined ("entityType" and "itemType") and passed to the plugin.
 
 ## Running several instances of a plugin
 
@@ -156,8 +189,10 @@ Here is an example of how to configure several instances of a plugin called "dat
 
 ## Checking the status of all plugins
 
-It is possible to read the status of all plugins through [Linkurious Enterprise's plugin status API](https://doc.linkurio.us/server-sdk/2.9.0/apidoc/#api-Plugin-getPlugins).   
-Just open this URL with your browser: https://linkurious.example.com**/api/admin/plugins** 
+The state of every plugin instance (Running, Stopped, Disabled, or Error) is displayed next to each plugin in the [Plugins Manager](#managing-plugins-with-the-plugins-manager) page.
+
+It is also possible to read the status of all plugins through [Linkurious Enterprise's plugin status API](https://doc.linkurio.us/server-sdk/latest/apidoc/#api-Plugin-getPlugins).  
+Just open this URL with your browser: https://linkurious.example.com**/api/admin/plugins**
 
 This will return a JSON object with the status of all plugins:
 
@@ -174,12 +209,14 @@ This will return a JSON object with the status of all plugins:
 
 "State" can be any of the following:
 
-- "running": the plugin is running normally  
-- "stopped": the plugin is stopped  
-- "error-runtime": the plugin stopped running because of a runtime error  
+- "running": the plugin is running normally
+- "stopped": the plugin is stopped
+- "error-runtime": the plugin stopped running because of a runtime error
 - "error-manifest": the plugin did not start because its manifest was invalid
 
 ## Restarting all plugins
+
+From the [Plugins Manager](#managing-plugins-with-the-plugins-manager) page, you can start, stop or restart an individual plugin using its actions.
 
 When saving the configuration of plugins through the Web interface (see [how to configure a plugin](#configuring-a-plugin)), pressing the "save" button actually updates the configuration and restarts all plugins.
 
@@ -194,8 +231,9 @@ Custom actions are an easy way to open Web pages by right-clicking on a node in 
 Imagine I have a plugin that computes the age of a person based on their date of birth.  
 This plugin is served under https://linkurious.acme.com/plugins/age/ and takes a parameter "date", e.g.: https://linkurious.acme.com/plugins/age/?date=1984-07-31
 
-I would like this plugin to open when I right-click on a person and select the menu "Custom actions" `>`  "Compute age".  
-I will [create a new Custom action](https://doc.linkurio.us/user-manual/2.9.0/custom-actions/#creating-and-managing-custom-actions), call it "Compute age" and define its URL template as follows:  
+I would like this plugin to open when I right-click on a person and select the menu "Custom actions" `>` "Compute age".  
+I will [create a new Custom action](https://doc.linkurio.us/user-manual/2.9.0/custom-actions/#creating-and-managing-custom-actions), call it "Compute age" and define its URL template as follows:
+
 ```
 {{baseURL}}plugins/age/?date={{(node:Person).dateOfBirth}}
 ```
@@ -203,8 +241,14 @@ I will [create a new Custom action](https://doc.linkurio.us/user-manual/2.9.0/cu
 This means that:
 
 - the custom action will be available only on nodes of type "Person"
-- when clicking on the custom action, a new browser tab will be open at the address defined by the custom actions URL template  
+- when clicking on the custom action, a new browser tab will be open at the address defined by the custom actions URL template
 - to build the address, `{{baseURL}}` will be replaced with the address of Linkurious Enterprise, and {{(node:Person).dateOfBirth}} will be replaced by the value of the "dateOfBirth" property on the currently selected node.
+
+By default, the action opens in a new browser tab. If you want it to open **as a modal inside Linkurious Enterprise** (in an embedded iframe) instead, add the `#linkurious-modal` hash at the end of the URL template, e.g.:
+
+```
+{{baseURL}}plugins/age/?date={{(node:Person).dateOfBirth}}#linkurious-modal
+```
 
 Here is an example of a custom action being used: [https://www.loom.com/share/dab052340731480096dac9580cdca4f9](https://www.loom.com/share/dab052340731480096dac9580cdca4f9)
 
@@ -212,15 +256,15 @@ Here is an example of a custom action being used: [https://www.loom.com/share/da
 
 ## General principle
 
-Plugins are run in separate processes from the main Linkurious Enterprise process.   
+Plugins are run in separate processes from the main Linkurious Enterprise process.  
 ![](./assets/image1.png)
 
 ## How a plugin starts
 
 To start a plugin, Linkurious Enterprise reads the [manifest of the plugin](#plugin-manifest) and checks:
 
-- if the plugin is compatible with the current version of Linkurious Enterprise  
-- if the folder declared in "publicRoute" exists  
+- if the plugin is compatible with the current version of Linkurious Enterprise
+- if the folder declared in "publicRoute" exists
 - if the file declared in "backendFiles" exist
 
 It then starts a new process called a "plugin host". The plugin host is connected to the main Linkurious Enterprise instance through a communication channel that allows the main instance to control the plugin (e.g. restart, stop, etc.).
@@ -231,16 +275,16 @@ When the plugin host starts, it loads the files declared in the "backendFiles" s
 
 When Linkurious Enterprise receives a query on it's API that is addressed to a plugin, it does the following:
 
-- Checks that the current user is authenticated (if not, redirects to the login page)  
-- Checks that the plugin is currently running (if not, respond with a 404 error)  
-- Forwards the query to the appropriate plugin (see [Adding custom APIs to your plugin](#adding-custom-apis-to-your-plugin) and  [Backend APIs](#backend-apis))  
+- Checks that the current user is authenticated (if not, redirects to the login page)
+- Checks that the plugin is currently running (if not, respond with a 404 error)
+- Forwards the query to the appropriate plugin (see [Adding custom APIs to your plugin](#adding-custom-apis-to-your-plugin) and [Backend APIs](#backend-apis))
 - Reads the response from the plugin and forwards it to the original client.
 
 # Creating a "Hello World" plugin
 
 ## Creating the plugin development folder
 
-While in development, you can directly create a folder in the `linkurious/data/plugins` folder and start working from there. The folder name must end with `.lke`.   
+While in development, you can directly create a folder in the `linkurious/data/plugins` folder and start working from there. The folder name must end with `.lke`.  
 First, we create a folder called `hello-world.lke` in `linkurious/data/plugins`
 
 ## Creating the manifest
@@ -285,7 +329,7 @@ After this, open the [plugin status API](https://doc.linkurio.us/server-sdk/2.9.
 ## Adding frontend files
 
 Our plugin is now running, but it does not have any frontend files.  
-Let's add a simple HTML page to our plugin. 
+Let's add a simple HTML page to our plugin.
 
 First, create a "public" (the name can be anything you like) folder within the `hello-world.lke` folder, and create an HTML file called "index.html" (or any other name) in it with the following content:
 
@@ -294,7 +338,7 @@ First, create a "public" (the name can be anything you like) folder within the `
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <base href="/">
+    <base href="/" />
     <title>Hello World</title>
   </head>
   <body>
@@ -328,7 +372,7 @@ Now we need to declare in the plugin manifest where the public files are. Edit t
 
 Again, open the "Global configuration" page in Linkurious Enterprise (e.g. [http://localhost:3000/admin/configuration#plugins](http://localhost:3000/admin/configuration#plugins)) and scroll to the "Plugin settings" section. Type a space somewhere in the configuration field (to enable the "save" button) and click "save", this will restart the plugin service and restart all plugins, including our "Hello World" plugin.
 
-After this, you can now open the plugin page in the under the "/plugins/hello-world/" path (e.g.   
+After this, you can now open the plugin page in the under the "/plugins/hello-world/" path (e.g.  
 [http://localhost:3000/plugins/hello-world/](http://localhost:3000/plugins/hello-workd/)). If you named your HTML file "index.html", you can omit the file name ("index.html" is returned by default when no file is specified). Otherwise, you have to specify the file name (e.g. [http://localhost:3000/plugins/hello-world/my-custom-name.html](http://localhost:3000/plugins/hello-world/my-custom-name.html)).  
 ![](./assets/image2.png)
 
@@ -342,8 +386,8 @@ Start by creating a folder called "backend" within the `hello-world.lke` folder,
 The content of `routes.js` should be:
 
 ```javascript
-module.exports = function(options) {
-  options.router.get("/my-api", function(req, res) {
+module.exports = function (options) {
+  options.router.get("/my-api", function (req, res) {
     res.json(options.configuration);
   });
 };
@@ -422,8 +466,8 @@ Import and use your dependency in your backend code by editing the "routes.js" f
 ```javascript
 const myBackendLibrary = require("lodash");
 
-module.exports = function(options) {
-  options.router.get("/my-api", function(req, res) {
+module.exports = function (options) {
+  options.router.get("/my-api", function (req, res) {
     res.json(myBackendLibrary.omit(options.configuration, ["basePath"]));
   });
 };
@@ -450,7 +494,7 @@ The content of `index.js` should be:
 
 ```javascript
 const myFrontendLibrary = require("lodash");
-document.addEventListener("DOMContentLoaded", function(event) {
+document.addEventListener("DOMContentLoaded", function (event) {
   const p = document.createElement("p");
   p.textContent = myFrontendLibrary.camelCase(["I'm using my local bundle"]);
   document.getElementsByTagName("body")[0].appendChild(p);
@@ -526,7 +570,12 @@ Let's import the library into your "index.html" page:
   ...
   <body>
     ...
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js" integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"
+      integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
   </body>
 </html>
 ```
@@ -541,9 +590,14 @@ Add a sample JavaScript code into your "index.html" to use the library:
   ...
   <body>
     ...
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js" integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"
+      integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <script>
-      document.addEventListener("DOMContentLoaded", function(event) {
+      document.addEventListener("DOMContentLoaded", function (event) {
         const p = document.createElement("p");
         p.textContent = _.camelCase(["I'm using an imported library"]);
         document.getElementsByTagName("body")[0].appendChild(p);
@@ -569,7 +623,7 @@ Position your shell in the `linkurious/data/plugins/hello-world.lke` directory a
 rm -rf ./node_modules && npm i --omit=dev --omit=optional
 ```
 
-Now, position your shell in the `linkurious/data/plugins/` directory and create a [TAR](https://en.wikipedia.org/wiki/Tar_(computing)#File_format) archive of the plugin called `hello-world-1.0.0.lke`:
+Now, position your shell in the `linkurious/data/plugins/` directory and create a [TAR](<https://en.wikipedia.org/wiki/Tar_(computing)#File_format>) archive of the plugin called `hello-world-1.0.0.lke`:
 
 ```bash
 tar -cvf hello-world-1.0.0.lke ./hello-world.lke
@@ -595,46 +649,74 @@ To start working on the data-table plugin example, keep in mind that you need to
 
 ## Plugin manifest
 
-The manifest is a JSON file that must be located in the plugin's root folder.   
+The manifest is a JSON file that must be located in the plugin's root folder.  
 The manifest file must contain the following fields:
 
-- **name**  
-  - **required**  
-  - type: string (must be only lowercase letters, numbers, and "-")  
-  - what: Name of the plugin   
-  - example: "hello-world"  
-- **version**  
-  - **required**  
-  - type: SemVer string  
-  - what: Version of the plugin itself  
-  - example: "1.0.3"  
-- **pluginApiVersion**  
-  - **required**  
-  - type: SemVer string  
-  - what: Version of the Linkurious Enterprise plugin API used by plugin  
-  - example: "1.0.0"  
-- **linkuriousVersion**  
-  - **optional**  
-  - type: undefined OR SemVer strings  
-  - what: Linkurious Enterprise REST API version used by this plugin (undefined means "no dependency")  
-  - example: "2.9.0"  
-- **publicRoute**  
-  - **optional**  
-  - type: undefined OR path string  
-  - what: Path (relative to manifest file) of the folder containing public files  
-  - example: "public"  
-- **singlePageAppIndex**  
-  - **optional**  
-  - type: undefined OR path string  
-  - what: a path to a file inside "publicRoute" (relative to "publicRoute") that should be sent when a public resource is requested but does not exist. Useful for single page web applications with their own frontend router that need a server-side catch-all.  
-  - example: "index.html"  
-- **backendFiles**  
-  - **optional**  
-  - type: undefined OR string OR Array of strings  
-  - what: path(s) to route files within the plugin (paths are relative to manifest file)  
-  - example: "backend/routes.js"
+- **name**
+  - **required**
+  - type: string (must be only lowercase letters, numbers, and "-")
+  - what: Name of the plugin
+  - example: "hello-world"
+- **version**
+  - **required**
+  - type: SemVer string
+  - what: Version of the plugin itself
+  - example: "1.0.3"
+- **pluginApiVersion**
+  - **required**
+  - type: SemVer string
+  - what: Version of the Linkurious Enterprise plugin API used by plugin
+  - example: "1.0.0"
+- **linkuriousVersion**
+  - **optional**
+  - type: undefined OR SemVer strings
+  - what: Linkurious Enterprise REST API version used by this plugin (undefined means "no dependency")
+  - example: "2.9.0"
+- **publicRoute**
+  - **optional**
+  - type: undefined OR path string
+  - what: Path (relative to manifest file) of the folder containing public files
+  - example: "public"
+- **singlePageAppIndex**
+  - **optional**
+  - type: undefined OR path string
+  - what: a path to a file inside "publicRoute" (relative to "publicRoute") that should be sent when a public resource is requested but does not exist. Useful for single page web applications with their own frontend router that need a server-side catch-all.
+  - example: "index.html"
+- **backendFiles**
+  - **optional**
+  - type: undefined OR string OR Array of strings
+  - what: path(s) to route files within the plugin (paths are relative to manifest file)
+  - example: `backend/routes.js`
+- **icon**
+  - **optional**
+  - since: 4.3.6
+  - type: undefined OR non-empty string
+  - what: An icon for the plugin, displayed in the Linkurious Enterprise UI (e.g. in the plugins manager). It can be a URL or a [data URI](https://developer.mozilla.org/en-US/docs/Web/URI/Schemes/data) (e.g. a base64-encoded PNG).
+  - example: `data:image/png;base64,iVBORw0KGgo…`
+- **i18n**
+  - **optional**
+  - since: 4.3.6
+  - type: undefined OR object
+  - what: Localized strings for the plugin, keyed by language code (e.g. "en", "fr", "ja"). Each language entry is an object with a "title" and a "description" string. These values are used to display the plugin name and description in the user's language in the Linkurious Enterprise UI.
+  - example:
+    ```json
+    {
+      "en": {
+        "title": "Hello world",
+        "description": "A boilerplate of how to start Linkurious plugin development."
+      },
+      "fr": {
+        "title": "Hello world",
+        "description": "Un exemple de code pour se lancer dans le développement de plugins Linkurious."
+      }
+    }
+    ```
 
-Example manifest file: [https://github.com/Linkurious/lke-plugin-data-table/blob/master/manifest.json](https://github.com/Linkurious/lke-plugin-data-table/blob/master/manifest.json) 
+Note: fields without a "since" value are supported by all versions of Linkurious Enterprise; fields with a "since" value (e.g. 4.3.6) are newer additions.
+
+To keep a plugin compatible with older versions of Linkurious Enterprise (which validate the manifest strictly), the manifest content can be split over several files: the canonical `manifest.json` with the base fields supported by all versions (those without a "since" value), and a supplement file with the newer fields (those with a "since" value). Linkurious Enterprise merges them when loading the plugin.
+
+Example manifest file: [https://github.com/Linkurious/lke-plugin-data-table/blob/master/manifest.json](https://github.com/Linkurious/lke-plugin-data-table/blob/master/manifest.json)
 
 ## Frontend files
 
@@ -645,9 +727,9 @@ All files must be located under the folder defined as "publicRoute" in the manif
 You can then access them by specifying their path relative to the "publicRoute" in the URL.  
 Few examples to access files shipped within the "publicRoute" of a plugin called "my-plugin":
 
-- publicRoute/pages/index.html `->` [http://localhost:3000/plugins/my-plugin/pages/index.html](http://localhost:3000/plugins/my-plugin/pages/index.html) or simply [http://localhost:3000/plugins/my-plugin/pages/](http://localhost:3000/plugins/my-plugin/pages/) (index.html will be interpreted by default)  
-- publicRoute/pages/about.html `->` [http://localhost:3000/plugins/my-plugin/pages/about.html](http://localhost:3000/plugins/my-plugin/pages/about.html)  
-- publicRoute/css/main.css `->` [http://localhost:3000/plugins/my-plugin/css/main.css](http://localhost:3000/plugins/my-plugin/css/main.css)  
+- publicRoute/pages/index.html `->` [http://localhost:3000/plugins/my-plugin/pages/index.html](http://localhost:3000/plugins/my-plugin/pages/index.html) or simply [http://localhost:3000/plugins/my-plugin/pages/](http://localhost:3000/plugins/my-plugin/pages/) (index.html will be interpreted by default)
+- publicRoute/pages/about.html `->` [http://localhost:3000/plugins/my-plugin/pages/about.html](http://localhost:3000/plugins/my-plugin/pages/about.html)
+- publicRoute/css/main.css `->` [http://localhost:3000/plugins/my-plugin/css/main.css](http://localhost:3000/plugins/my-plugin/css/main.css)
 - publicRoute/js/main.js `->` [http://localhost:3000/plugins/my-plugin/js/main.js](http://localhost:3000/plugins/my-plugin/js/main.js)
 
 ### The `<base>` tag
@@ -655,11 +737,11 @@ Few examples to access files shipped within the "publicRoute" of a plugin called
 All the HTML files in your plugin should contain a base tag with the href attribute set to "/", like this:
 
 ```html
-<base href="/">
+<base href="/" />
 ```
-   
+
 This is needed because Linkurious Enterprise can be served under a configurable path, and it will patch the value of the `<base>` tag in your HTML on the fly for your plugin to continue working normally.  
-Details here: [https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) 
+Details here: [https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
 
 ### Single-page applications (SPA)
 
@@ -671,54 +753,113 @@ This is because your plugin will have several virtual URLs (e.g. /plugins/my-plu
 To add new APIs to the backend, you should create a file referenced in the "backendFiles" entry of the manifest. Each file referenced in "backendFiles" must have the following structure:
 
 ```javascript
-module.exports = function(options) {
+module.exports = function (options) {
   // create a GET endpoint called api-1
-  options.router.get("/api-1", function(req, res) {
+  options.router.get("/api-1", function (req, res) {
     // send a response in JSON format
-    res.json({"some-key": "some-value"});
+    res.json({ "some-key": "some-value" });
   });
   // create a POST endpoint called api-2
-  options.router.post("/api1", function(req, res) {
+  options.router.post("/api1", function (req, res) {
     // send a response in JSON format
-    res.json({"some-key": "some-value"});
+    res.json({ "some-key": "some-value" });
   });
 };
 ```
 
 ### Router, Request and Response interface
 
-From the example above, notice that we use the object "options.router" to create new API endpoints for the plugin. "options.router" is a standard express.js Router object. The reference of this interface is available here: [https://expressjs.com/en/4x/api.html#router](https://expressjs.com/en/4x/api.html#router) 
+From the example above, notice that we use the object "options.router" to create new API endpoints for the plugin. "options.router" is a standard express.js Router object. The reference of this interface is available here: [https://expressjs.com/en/4x/api.html#router](https://expressjs.com/en/4x/api.html#router)
 
 When creating handlers for API endpoints, notice that a handler always receives 2 parameters: "req" and "res". These two objects are standard "Request" and "Response" express.js objects. The contract of these interfaces is available here:
 
-- Request: [https://expressjs.com/en/4x/api.html#req](https://expressjs.com/en/4x/api.html#req)   
-- Response: [https://expressjs.com/en/4x/api.html#res](https://expressjs.com/en/4x/api.html#res) 
+- Request: [https://expressjs.com/en/4x/api.html#req](https://expressjs.com/en/4x/api.html#req)
+- Response: [https://expressjs.com/en/4x/api.html#res](https://expressjs.com/en/4x/api.html#res)
 
 ### Interface of "options"
 
-In the above example, you can notice that we use the "options" parameter, which is injected into the backend file by Linkurious Enterprise. 
+In the above example, you can notice that we use the "options" parameter, which is injected into the backend file by Linkurious Enterprise.
 
 Here is a formal [TypeScript](https://www.typescriptlang.org/) interface of the "options" object for **pluginApiVersion 1.0.0**:
 
 ```typescript
 // a basic plugin configuration
-interface BasePluginConfig {
-  basePath?: string;
+interface PluginConfig {
+  disabled?: boolean;
+  basePath: string;
   debugPort?: number;
 }
+
 // interface of the "options" object
-interface PluginOptions<PluginConfig extends BasePluginConfig> {
+interface PluginRouteOptions<C extends PluginConfig = PluginConfig> {
+  parentProcess: PluginParentProcess;
   router: express.Router;
-  configuration: PluginConfig;
+  configuration: C;
   getRestClient: (req: express.Request) => RestClient;
 }
 ```
 
 Details:
 
-- **"router"** contains an express.js Router object.  
-- **"configuration"** contains the configuration of the current plugin, as defined in the "Plugin settings" section of the Global configuration of Linkurious Enterprise.  
-- **"getRestClient()"** is a method that returns a [REST Client instance](https://github.com/Linkurious/linkurious-rest-client/blob/master/src/index.ts#L30). The returned "RestClient" object can be used to directly send requests to Linkurious Enterprise's REST API. See [how to use Linkurious Enterprise's REST API](#using-the-linkurious-enterprise-api) for details.
+- `parentProcess` is a handle to communicate with the parent process (the main Linkurious Enterprise server). It is used to send plugin metadata, such as plugin actions, back to Linkurious Enterprise. See [Sending metadata to Linkurious Enterprise](#sending-metadata-to-linkurious-enterprise) for details.
+- `router` contains an express.js Router object.
+- `configuration` contains the configuration of the current plugin, as defined in the "Plugin settings" section of the Global configuration of Linkurious Enterprise.
+- `getRestClient()` is a method that returns a REST Client instance. The returned `RestClient` object can be used to directly send requests to Linkurious Enterprise’s REST API. See [how to use Linkurious Enterprise’s REST API](#using-the-linkurious-enterprise-api) for details.
+
+Note: you don't need to redefine these types in your plugin source code. They are exported by the [`@linkurious/rest-client`](https://www.npmjs.com/package/@linkurious/rest-client) package (the options type is exported as `PluginRouteOptions`, along with `PluginParentProcess`, `PluginMetadata` and `PluginAction`), so you can import them directly.
+
+### Sending metadata to Linkurious Enterprise
+
+A plugin can send metadata back to the main Linkurious Enterprise process through the "parentProcess" object injected in the backend options. This is currently used to declare **plugin actions**: entries that are surfaced in the Linkurious Enterprise UI (similar to [custom actions](#opening-a-plugin-using-custom-actions)) and that open a URL, relative to the plugin’s base path, when triggered.
+
+Note: unlike a [custom action](#opening-a-plugin-using-custom-actions) URL template (which must start with `{{baseURL}}`), a plugin action's `urlTemplate` is resolved **relative to the plugin's base path**. You should not prepend `{{baseURL}}`: a value of `/` points to the plugin's own home page, and `/my-page` points to a page under the plugin. The rest of the template syntax (e.g. `{{(node:Person).dateOfBirth}}`) is the same as for custom actions.
+
+Note: as with custom actions, appending the `#linkurious-modal` hash to the `urlTemplate` opens the action as a modal inside Linkurious Enterprise (in an embedded iframe) instead of a new browser tab, e.g. `/my-page#linkurious-modal`.
+
+Metadata is sent by calling `parentProcess.postMetadata()`. This should be done at least once each time the plugin starts (metadata is **not** persisted between restarts), and again whenever the metadata changes.
+
+Here is the TypeScript interface of the `parentProcess` object and the metadata it accepts:
+
+```typescript
+// handle to communicate with the parent process
+interface PluginParentProcess {
+  postMetadata(metadata: PluginMetadata): void;
+}
+// the metadata a plugin can expose to Linkurious Enterprise
+interface PluginMetadata {
+  actions: PluginAction[];
+}
+// an action exposed by a plugin to Linkurious users
+interface PluginAction {
+  // a human readable name identifying the action
+  name: string;
+  // the URL template invoked by the action, relative to the plugin's base path.
+  // It uses the same syntax as a custom action URL template.
+  urlTemplate: string;
+  // an optional data-source key this action is scoped to.
+  // If undefined, the action is available for any data-source.
+  sourceKey?: string;
+  // who can access this action: admins only ("admin") or all authenticated users ("*")
+  access: "admin" | "*";
+}
+```
+
+Here is an example of a backend file that registers a single plugin action:
+
+```javascript
+module.exports = function (options) {
+  // register one or more plugin actions with the host process
+  options.parentProcess.postMetadata({
+    actions: [
+      {
+        name: "Hello world",
+        urlTemplate: "/",
+        access: "*",
+      },
+    ],
+  });
+};
+```
 
 ### Configuration validation
 
@@ -729,24 +870,25 @@ It is important to specify that Linkurious Enterprise doesn't perform any check 
 In Linkurious Enterprise, secrets are usually encoded in the configuration to avoid plain-text secrets in the configuration file. The encoding of passwords in the configuration file is triggered by the presence of special keyboards in the configuration field name.  
 As a plugin developer, if you want to enable encoding of a configuration field of your plugin, you have to make sure the configuration key contains one of the following keywords:
 
-- "apiKey"  
-- "password" or "Password"  
+- "apiKey"
+- "password" or "Password"
 - "secret" or "Secret"
 
 ### Audit trail
 
-For compliance reasons, it is sometimes necessary to enable the ["Audit trail" feature in Linkurious Enterprise](https://doc.linkurio.us/admin-manual/latest/audit-trail/). When this feature is enabled, most API calls to Linkurious Enterprise's API are traced in a special log file that can be inspected when needed. 
+For compliance reasons, it is sometimes necessary to enable the ["Audit trail" feature in Linkurious Enterprise](https://doc.linkurio.us/admin-manual/latest/audit-trail/). When this feature is enabled, most API calls to Linkurious Enterprise's API are traced in a special log file that can be inspected when needed.
 
-When the audit trail feature is enabled, queries to plugin APIs (along with their parameters and identifier of the current user) are also logged in the audit trail. However, for performance and scalability reasons, the responses sent by plugin APIs are included in the audit trail **ONLY IF** the content-type of the response is "application/json". 
+When the audit trail feature is enabled, queries to plugin APIs (along with their parameters and identifier of the current user) are also logged in the audit trail. However, for performance and scalability reasons, the responses sent by plugin APIs are included in the audit trail **ONLY IF** the content-type of the response is "application/json".
 
 ### Current user information
 
-If you need to know who is the currently connected user sending requests to any API endpoint, here is how to access this information:  
+If you need to know who is the currently connected user sending requests to any API endpoint, here is how to access this information:
+
 - User ID
-  - Description: identifier of the current user object in Linkurious Enterprise  
+  - Description: identifier of the current user object in Linkurious Enterprise
   - How to read it: In the endpoint handler, read `req.headers["linkurious-user-id"]`
 - User email
-  - Description: email of the current user  
+  - Description: email of the current user
   - How to read it: In the endpoint handler, read `req.headers["linkurious-user-email"]`
 
 ### Writing to the plugin logs
@@ -764,7 +906,7 @@ Using this method will automatically interact with the API as the currently auth
 ### Example
 
 ```javascript
-module.exports = function(options) {
+module.exports = function (options) {
   options.router.get("/api-user", async function (req, res) {
     try {
       // get the rest-client
@@ -772,13 +914,13 @@ module.exports = function(options) {
       // get the current user info
       const user = await rest.auth.getCurrentUser();
       // send response
-      res.json({"greeting": "Hello " + user.body.username});
-    } catch(e) {
+      res.json({ greeting: "Hello " + user.body.username });
+    } catch (e) {
       // handle errors
-      res.status(500).json({"error": e.message});
+      res.status(500).json({ error: e.message });
     }
   });
-}
+};
 ```
 
 ### RestClient reference
@@ -807,19 +949,19 @@ To enable the debug mode of the Plugin, first of all is mandatory to configure t
 
 When the plugin is started, it is possible to [attach a node.js debugger to the running process](https://nodejs.org/en/docs/guides/debugging-getting-started/%20). You can use your preferred debugger, however below a list of common information you would need:
 
-- The debugger should be configured to *attach* to the port *debugPort.*  
-- The code executed by the plugin is not the one deployed by the admin, but an identical copy in a *.pluginCache* with the name of the *basePath* configuration.
+- The debugger should be configured to _attach_ to the port _debugPort._
+- The code executed by the plugin is not the one deployed by the admin, but an identical copy in a _.pluginCache_ with the name of the _basePath_ configuration.
 
   e.g. If you deploy a **data-table** plugin in `./plugins/data-table-v1.0.0.lke`, and configure it with `{"basePath": "data-table-node"}`, the remote folder that should be configured in your debugger is `./.pluginCache/data-table-node`
 
 If you are using Visual Studio Code as a developing environment, you can follow [this tutorial](https://code.visualstudio.com/docs/nodejs/nodejs-debugging).  
-In particular you will need to install the [Node Debug extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.node-debug2) and then configure the debug task *Attach*:  
+In particular you will need to install the [Node Debug extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.node-debug2) and then configure the debug task _Attach_:  
 ![](./assets/image7.png)
 
 A few configurations notes:
 
-* *remoteRoot* should be a valid path on your server  
-* *localRoot* should be a valid path containing the js files on your development environment (if you are developing in TypeScript, you may need to set it to `"${workspaceFolder}/dist"`)
+- _remoteRoot_ should be a valid path on your server
+- _localRoot_ should be a valid path containing the js files on your development environment (if you are developing in TypeScript, you may need to set it to `"${workspaceFolder}/dist"`)
 
 A final configuration based on a local docker deployment should look like:
 
@@ -842,7 +984,7 @@ A final configuration based on a local docker deployment should look like:
 To debug the frontend code, you don't need to activate any specific configuration. Just make sure to skip code minification/obfuscation so you can access the original source code within your Browser debugging tool.
 
 However, if you are working in a developing environment you can rely on the integration of the different components. If you are using Visual Studio Code for developing and Chrome as a browser, you can follow [this tutorial](https://code.visualstudio.com/blogs/2016/02/23/introducing-chrome-debugger-for-vs-code).  
-In particular you will need to install the [Debugger for Chrome extension](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome) and then configure the *Launch* debug task:  
+In particular you will need to install the [Debugger for Chrome extension](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome) and then configure the _Launch_ debug task:  
 ![](./assets/image8.png)
 
 A final configuration should look like this:
@@ -862,13 +1004,13 @@ A final configuration should look like this:
 When working on frontend development (e.g. when developing with the Angular framework), the Cookie SameSite policy can prevent the cookie from being set on queries to the server because the frontend files are not served on the same domain as the backend API.  
 Context:
 
-- Your Linkurious Enterprise server is running on [http://myserver.com:3000](http://myserver.com:3000)   
-- Your Angular development server is running on [http://localhost:4200](http://localhost:4200) 
+- Your Linkurious Enterprise server is running on [http://myserver.com:3000](http://myserver.com:3000)
+- Your Angular development server is running on [http://localhost:4200](http://localhost:4200)
 
 Solution to be compliant with the Cookie SameSite policy:
 
-- Edit your local `/etc/hosts` file (see [how](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/))  
-- Add the following entry in your hosts file: `127.0.0.1 front.myserver.com`  
+- Edit your local `/etc/hosts` file (see [how](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/))
+- Add the following entry in your hosts file: `127.0.0.1 front.myserver.com`
 - Access your Angular development server with this URL: [http://front.myserver.com:4200](http://front.myserver.com:4200)
 
 Since the frontend and backend are served on the same top-level domain (myserver.com), the SameSite Cookie policy is respected.
