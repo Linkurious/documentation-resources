@@ -10,8 +10,8 @@
 | [Azure Cosmos DB][d]       |      Yes        |      Yes        |       Yes       |       Yes       |         Yes        |         Yes        |
 | [Memgraph][e]              | 2.4 - 2.7[^2]   | 2.4 - 2.7[^2]   |  2.4 - 2.7[^2]  | 2.4 - 2.16[^2]  |    2.4 - 3.1[^2]   |    2.4 - 3.6[^2]   |
 | [Amazon Neptune][f]        |   1.2.0[^2]     |   1.2.0[^2]     |    1.2.0[^2]    |    1.3.0[^2]    |      1.3.0[^2]     |      1.3.4[^2]     |
-| [Google Spanner][g]        |       No        |       No        |       No        |     No[^3]      |         Yes        |         Yes        |
-| [Google BigQuery][h]       |       No        |       No        |       No        |       No        |         No         |        Yes[^4]     |
+| [Google Spanner Graph][g]  |       No        |       No        |       No        |     No[^3]      |         Yes        |         Yes        |
+| [Google BigQuery Graph][h] |       No        |       No        |       No        |       No        |         No         |        Yes[^4]     |
 | [MySQL][i]                 |   5.6 - 8.0     |   5.6 - 8.0     |    5.6 - 8.0    |       8.0       |      8.0 - 8.4     |      8.0 - 8.4     |
 | [MariaDB][j]               |  10.1 - 10.5    |  10.1 - 10.5    |   10.1 - 10.5   |  10.6 - 10.11   |     10.6 - 11.4    |     10.6 - 11.8    |
 | [Microsoft SQL Server][k]  |  2014 - 2019    |  2014 - 2019    |   2014 - 2022   |   2014 - 2022   |     2014 - 2022    |     2014 - 2022    |
@@ -30,6 +30,5 @@
 
 [^1]: [Incremental indexing](https://doc.linkurious.com/admin-manual/4.0/incremental-indexing/) on Neo4j 5.x clusters is supported only if Linkurious Enterprise is 4.0.4 or higher and Neo4j is 5.4.0 or higher
 [^2]: No support for [incremental indexing](https://doc.linkurious.com/admin-manual/4.0/incremental-indexing/) with Elasticsearch
-[^3]: Google Spanner is supported in beta on Linkurious Enterprise 4.1.13 and higher
-[^4]: Google BigQuery is fully supported only on Linkurious Enterprise 4.3.3 and higher
-
+[^3]: Google Spanner Graph is supported in beta on Linkurious Enterprise 4.1.13 and higher
+[^4]: Google BigQuery Graph is fully supported only on Linkurious Enterprise 4.3.3 and higher
