@@ -37,7 +37,6 @@ The plugin manifest contains a minimum requirement for the Linkurious Enterprise
 
 - Linkurious Enterprise v4.2.0+
 - A connected data-source in Linkurious
-- A Linkurious Enterprise [*Service Account*](#service-account-recommendations) to be the owner of the new objects in the destination datasource
 
 
 ## Configuring the Plugin
@@ -54,11 +53,9 @@ Here an example of the configuration in the `Plugin settings` section of Linkuri
 }
 ```
 
-* `saUsernameOrEmail` (optional): the `username` or `email` of an existing *Service Account* that will be used to perform any export and import activities. This parameter can be omitted when performing the actions with the logged in account.
-* `saPassword` (optional): if not specified, the plugin will allow operations only when directly connected as the user specified in `saUsernameOrEmail`; if specified, it has to contain the password of the `saUsernameOrEmail` account for impersonation during export / import activities.
 * `enableServices` (optional): a list of services to activated for the import procedure (see [Data Migration scope](#data-migration-scope) for the list of accepted values); this is not usable in conjuction with `disableServices`.
 * `disableServices` (optional): a list of services to be disabled from the import procedure (see [Data Migration scope](#data-migration-scope) for the list of accepted values); this is not usable in conjuction with `enableServices`.
-  
+
 > For ensuring file compatibility, choosing to activate only a subset of services will not impact the export procedure that is providing the same output regardless of this configuration.
 
 Simplest configuration to only migrate the schema:
@@ -76,18 +73,12 @@ Simplest configuration to only migrate the schema:
 }
 ```
 
-### Service Account Recommendations
+### User Account Recommendations
 
-The *Service Account* is the user used both for export and import activities implying that:
-* any operation will be executed with the security permissions of the *Service Account*;
-* any change made to the system will be tracked with the name of the *Service Account* (e.g. when creating or updating a query the system will show: *updated by* and the reference of the *Service Account*).
+The plugin will act on behalf of the current user, for _export_ and _import_ activities.
 
-If the `saUsernameOrEmail` parameter is not specified (default configuration), the user connected to Linkurious Enterprise at the moment of the operation will be used as *Service Account*.
-
-While it is safe to not specify a *Service Account*, it could be helpful to specify one to differentiate in the system the activities done via this plugin versus the manual changes done by the admin user. In this configuration, the [Audit Trail](#audit-trail) of this plugin will still allow to identify the real user triggering the action.
-
-If a custom *Service Account* is configured, it could be different among the various instances, however it is suggested to reuse the same username (and possibly different passwords) for an easier management. The *Service Account* account should also have the correct access rights that by default requires the built-in *Admin* role, lower securities can be granted in case the plugin is configured to work on a limited [scope](#data-migration-scope).
-
+The _export_ is restricted by security access to the items accessible by the user account.
+Because of this, the recommendation is to be logged in as the `Admin` built-in group when using the plugin.
 
 ## How to use the plugin
 
@@ -146,7 +137,7 @@ The table after shows the full list of changes that will be imported in the syst
 * It is possible to click on each number to get the full list of changes in JSON format for deeper analysis, each object contains information in the `newValue` or `oldValue` (updates actions have both data to allow comparisons)
 
 Once the review has been performed, it is possible to start the real import process by clicking on the `IMPORT` button.
-After confirming the extra 
+After confirming the extra
 ![](doc-assets/import-confirm.png)
 
 #### How to handle errors
@@ -170,47 +161,40 @@ The above definition is excluding:
 * User's migration and any of their private objects (e.g. visualizations, private queries, etc.); the plugin takes into consideration only shared objects
 
 > During the migration activities, the plugin cannot ensure the reuse of same internal IDs when creating new items. So the general assumption is that those IDs will be different and shouldn't be hardcoded any where.
-> 
+>
 > The plugin is safely managing the mapping of IDs relative to security and sharing options, but is not performing any other data manipulation (e.g. in the contents of the Queries or Custom Actions).
 
 Below the full list of configurations in scope:
 * **Schema Nodes** (service: `schema_nodes`): schema definitions for Node Categories and their properties (including visibility and type definition)
-  
+
   > Physical deletions of those objects are not possible, any `delete` activity is implemented as change of visibility to none
 * **Schema Edges** (service: `schema_edges`): schema definitions for Edge Types and their properties (including visibility and type definition)
-  
+
   > Physical deletions of those objects are not possible, any `delete` activity is implemented as change of visibility to none
 * **Datasource** (service: `datasource`): global datasource settings such as `Strict Schema` enabling, `Property Key Access Right` enabling, `Default Styles`, `Default Captions`, `Default Properties' order`
-  
+
   > All the changes are foreseen as a single `update` activity.
-  > 
+  >
   > `Default Styles` are represented by a single JSON object, any change to its content is seen as a single change of the whole JSON (there is no fine granularity changes tracking). The same concept applies to `Default Captions`.
 * **Custom Groups** (service: `custom_groups`, requires `datasource` and `schema_nodes` and `schema_edges`): custom groups and all their securities definition, built-in groups are excluded since automatically created by the system
-  
+
   > IDs of custom groups will be different from the one in the source system: possible impact on automatic group mapping of groups with external systems (manual configuration out of scope of this plugin)
 * **Queries** (service: `queries`, requires `custom_groups`): not private Static Queries (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
-  
+
   > If an existing Static Query is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
 * **Query with dynamic inputs** (service: `templates`, requires `custom_groups`, `tags`): not private Query with dynamic inputs (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
-  
+
   > If an existing Query with dynamic inputs is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
-* **Query Tags** (service: `tags`, requires the configuration of a *Service Account* with *Can create read-only queries and run queries* access rights): all query tags
+* **Query Tags** (service: `tags`, requires *Can create read-only queries and run queries* access rights): all query tags
   > Queries that were assigned tags before the migration, will still have the same tags assigned after the migration.
 * **Custom Actions** (service: `custom_actions`, requires `custom_groups`): not private Custom Actions (i.e. shared with everyone)
-  
+
   > If an existing Custom Action is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
 * **Alerts** (service: `alerts`, requires `custom_groups`): not private Alerts' definition, their models and their folder organization
-  
-  > Changes to alerts could cause the drop of results and their re-executions.
-  > 
-  > Changing the alert's title will trigger a sequence of `delete` and `insert` actions implying the lost of worked items. To keep the previous work, it is recommended to manually align the title before the synchronization to trigger only an `update` of the contents.
-  > 
-  > 
-  > Changing the model name of an alert will cause the delition of the old model and the creation of a new one causing a `(deleted)` message on the existing cases. To avoid the inconvenience, it is recommended to manually align the model names before the synchronization to trigger only an `update` of the contents.
+
+  > Deletion of alerts (not their models) will cause the drop of the cases.
 * **Spaces** (service: `spaces`, requires `custom_groups`)
-  
-  > Changing the space's title will trigger a sequence of `delete` and `insert` actions requiring the space being empty. To avoid an error during the synchronization, it is recommended to manually align the title before launching the process.
-  > 
+
   > Removing non empty spaces is not possible, you will still be able to complete the synchronization but you will receive an error at the end with still some spaces to delete.
 * **Node Grouping Rules** (service: `node_grouping_rules`, requires `schema_nodes`): definition of node grouping rules of the datasource
   
@@ -220,20 +204,13 @@ Below the full list of configurations in scope:
 
 ## Audit Trail
 
-To mitigate the risks of using a [*Service Account*](#service-account-recommendations) and to provide additional support material in case of problems during the export / import,
-the plugin logs all the actions and their results adding the information of the real user connected to the system.
+To provide additional support material in case of problems during the export / import,
+the plugin logs all the actions and their results, including the user connected to the system.
 It is possible to access those logs from the following folder `<linkurious>/data/logs/plugins/config-migration.log` (the file name could be different in case of a plugin configuration different from the one proposed in this document).
-
-To ensure the best traceability of actions, it is recommended to embed the service accounts credentials in the plugin configurations and let the system administrators connect with their own accounts.
-
 
 ## Limitations
 
-* Due security restrictions, an `Application Key` cannot be used to perform all the migration activities requiring to specify an admin account
-* Due security restrictions, all the activities has to be performed through a *Service Account*: the export is limited to objet accessible to this account and the import is limited to objects owned by this account
-* Due security restrictions the *Service Account* cannot be associated to multiple built-in groups, so it is required to share configurations with custom groups instead of built-in one
 * Export and Import activities can be done only on datasources in the `ready` status
-* Due the identification of internal objects through incremental numbers, the synchronization of objects between `source` and `destination` is done through their names: this imply that changes to objects' names are tracked as a sequence of `delete` and `insert` actions instead of a single `update`
 * Due some internal logic, some updates may not be applied even if the API is not retouring an error (you will receive a dedicated error message telling this). A typical scenario is due configuration mistmatches between source and destination e.g. you have a numeric property indexed on a datasource configured with ElasticSearch but you try to import this configuration on a different datasource configured with Neo4j (which doesn't support index for numeric properties).
 * It is not possible to delete spaces that are not empty.
 
