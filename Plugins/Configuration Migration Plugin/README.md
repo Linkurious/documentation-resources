@@ -4,64 +4,61 @@
 
 The `Configuration Migration` is an official plugin designed to support the deployment of Linkurious Enterprise in a controlled environment having multiple environments (DEV, UAT, PROD etc.) where there is the need to promote configurations from a lower environment to an upper one.
 
-In this context the plugin allows synchronizing (i.e. keep aligned) configurations between environments through the below extra features:
-1. Export data from a datasource to a json file (see below what is in scope), usually executed on a lower environment
-2. Import configurations to a datasource from a json file (exported by a compatible version of this plugin), usually executed on an upper environment
+The plugin synchronizes configurations (see below what is in scope) between environments through two operations:
+1. Export configurations from a datasource to a JSON file, usually from a lower environment.
+2. Import configurations from a JSON file exported by a compatible version of the plugin into a datasource, usually in an upper environment.
 
-> The synchronization foreseen deletion activities in the `destination` datasource to keep it aligned with the `source`.
+> Synchronization can delete configurations from the `destination` datasource to align it with the `source`.
 
-Despite the original need, the export / import functionality could be helpful in other contexts.
+Export and import can also be useful in other contexts.
 
-Below an example of how the main screen looks like.
+The main screen looks like this:
 ![](doc-assets/plugin.png)
 
-> Due possible compatibility issues, the plugin is not supposed to be used to migrate configuration between different versions of Linkurious Enterprise. An error is shown in case the destination system and the exported file don't match on major and minor versioning.
+> The plugin is not intended to migrate configurations between different major or minor versions of Linkurious Enterprise. An error is shown if the source and destination versions do not match on major and minor version. The export format versions must also match.
 
 ### Versioning
 
-This plugin has strong dependencies with the version of Linkurious Enterprise since the configurations can vary according to new features. The plugin is also relying on Linkurious Enterprise's APIs so its compatibility is affected by the breaking changes introduced in some APIs.
+The plugin depends on the Linkurious Enterprise version because configurations can change as features are added. It also relies on Linkurious Enterprise APIs, so breaking API changes can affect compatibility.
 
-Because of the above dependencies, this plugin is versioned as vX.Y.Z where:
-* X will be increased every time there is a change in the core functionality of the plugin
-* Y will be increased every time the plugin is updated and tested for a more recent version of Linkurious Enterprise requiring adapting the plugin
-* Z will be increased for every patch or not breaking changes of a specific version Y
-For more details read the [prerequisites](#prerequisites) section.
+The plugin is versioned as vX.Y.Z:
+* X increases when the plugin's core functionality changes.
+* Y increases when the plugin is adapted and tested for a newer version of Linkurious Enterprise.
+* Z increases for patches or non-breaking changes to a specific Y version.
+For more details, see [Prerequisites](#prerequisites).
 
 Examples:
-* v0.1.3 means that this is the 3rd hotfix update of this plugin which can be used on any system which was using the plugin v0.1 (e.g. any version between v0.1.0 and v0.1.2)
-* v0.2.0 means that this release introduces the changes that most likely will require you to update to the latest Linkurious Enterprise version for being used properly
+* v0.1.3 is the third patch release of v0.1 and can be used on systems running earlier v0.1 releases.
+* v0.2.0 introduces changes that may require a newer version of Linkurious Enterprise.
 
-The plugin manifest contains a minimum requirement for the Linkurious Enterprise version, as a consequense the plugin will fail to start in case there is a mismatch of minor version of Linkurious Enterprise. This doesn't necessarily mean that the plugin is not compatible for this version. You can try to update the manifest and test it out on your own risks.
+The plugin manifest specifies a minimum Linkurious Enterprise version. The plugin cannot start on versions below that minimum.
 
 ### Prerequisites
 
-- Linkurious Enterprise v4.2.0+
-- A connected data-source in Linkurious
-- A Linkurious Enterprise [*Service Account*](#service-account-recommendations) to be the owner of the new objects in the destination datasource
+* Linkurious Enterprise v4.3.13+
+* A connected datasource in Linkurious Enterprise
 
 
 ## Configuring the Plugin
 
-Here an example of the configuration in the `Plugin settings` section of Linkurious Enterprise.
+Here is an example configuration in the `Plugin settings` section of Linkurious Enterprise:
 ```json
 {
   "config-migration": [
     {
-      "basePath:": "config-migration",
+      "basePath": "config-migration",
       "disableServices": ["queries", "templates", "custom_actions", "alerts"]
     }
   ]
 }
 ```
 
-* `saUsernameOrEmail` (optional): the `username` or `email` of an existing *Service Account* that will be used to perform any export and import activities. This parameter can be omitted when performing the actions with the logged in account.
-* `saPassword` (optional): if not specified, the plugin will allow operations only when directly connected as the user specified in `saUsernameOrEmail`; if specified, it has to contain the password of the `saUsernameOrEmail` account for impersonation during export / import activities.
-* `enableServices` (optional): a list of services to activated for the import procedure (see [Data Migration scope](#data-migration-scope) for the list of accepted values); this is not usable in conjuction with `disableServices`.
-* `disableServices` (optional): a list of services to be disabled from the import procedure (see [Data Migration scope](#data-migration-scope) for the list of accepted values); this is not usable in conjuction with `enableServices`.
-  
-> For ensuring file compatibility, choosing to activate only a subset of services will not impact the export procedure that is providing the same output regardless of this configuration.
+* `enableServices` (optional): a list of services to enable for import. See [Data Migration Scope](#data-migration-scope) for accepted values. Cannot be used with `disableServices`.
+* `disableServices` (optional): a list of services to disable for import. See [Data Migration Scope](#data-migration-scope) for accepted values. Cannot be used with `enableServices`.
 
-Simplest configuration to only migrate the schema:
+> Selecting a subset of services does not affect the export, which includes all supported configurations. Enabled services must include their dependencies, or the plugin will not start.
+
+The simplest configuration for migrating only the schema is:
 ```json
 {
   "config-migration": [
@@ -76,194 +73,161 @@ Simplest configuration to only migrate the schema:
 }
 ```
 
-### Service Account Recommendations
+### User Account Recommendations
 
-The *Service Account* is the user used both for export and import activities implying that:
-* any operation will be executed with the security permissions of the *Service Account*;
-* any change made to the system will be tracked with the name of the *Service Account* (e.g. when creating or updating a query the system will show: *updated by* and the reference of the *Service Account*).
-
-If the `saUsernameOrEmail` parameter is not specified (default configuration), the user connected to Linkurious Enterprise at the moment of the operation will be used as *Service Account*.
-
-While it is safe to not specify a *Service Account*, it could be helpful to specify one to differentiate in the system the activities done via this plugin versus the manual changes done by the admin user. In this configuration, the [Audit Trail](#audit-trail) of this plugin will still allow to identify the real user triggering the action.
-
-If a custom *Service Account* is configured, it could be different among the various instances, however it is suggested to reuse the same username (and possibly different passwords) for an easier management. The *Service Account* account should also have the correct access rights that by default requires the built-in *Admin* role, lower securities can be granted in case the plugin is configured to work on a limited [scope](#data-migration-scope).
-
+The plugin acts on behalf of the current user for export and import operations. The user must belong to the built-in `admin` group. Exports are limited to items accessible to that user.
 
 ## How to use the plugin
 
-To access the plugin it is recommended to directly open the home page of the plugin at the following path `https://<your-linkurious-instance>/plugins/config-migration`.
+To access the plugin, open `https://<your-linkurious-instance>/plugins/config-migration` or use the pre-configured plugin action in Linkurious Enterprise.
 
-It has to be deployed on both `source` and `destination` Linkurious Enterprise servers.
+The plugin must be deployed on both the `source` and `destination` Linkurious Enterprise servers.
 
 ### Export Feature
 
 1. Access the plugin home page on the `source` Linkurious Enterprise server
-1. Select the desired datasource to export from the connected one
+2. Select the desired datasource to export from the connected one
    ![](doc-assets/select-datasource.png)
-1. Press the `EXPORT` button and get the json file downloaded on the computer executing the activity
+3. Press `EXPORT` to download the JSON file to your computer
 
-> It is user's responsibility to ensure the security and integrity of the exported file.
+> You are responsible for ensuring the security and integrity of the exported file.
 
 #### How to handle errors
 
-There are two main possible cause of failure during the export:
-1. Incompatibility: you may receive errors telling that some Linkurious Enterprise API call failed, in that case make sure the plugin you have deployed is compatible with the Linkurious Enterprise version
-1. Duplicate detections: even though Linkurious Enterprise allows defining different objects with the same name / title, this is not allowed by the plugin to avoid unexpected behaviors during the import phase; you can fix it by renaming the conflict object or un-sharing it (when possible)
+Export can fail if a Linkurious Enterprise API call fails or if an object is shared with groups but has no groups assigned. Check the API error and plugin compatibility, or correct the object's sharing settings before retrying.
 
 
 ### Import Feature
 
 1. Perform a backup of the `destination` Linkurious Enterprise server
    > Restoring a backup is the only safe procedure to revert changes in case of critical unhandled errors.
-1. Put the file to import in a location available from the browser used to run the import (usually is not on the server)
-1. Access the plugin home page on the `destination` Linkurious Enterprise server
-1. Select the desired datasource where to import the configuration file
+2. Make the file available to the browser used for the import
+3. Access the plugin home page on the `destination` Linkurious Enterprise server
+4. Select the destination datasource
    ![](doc-assets/select-datasource.png)
-1. Press the `IMPORT` button
+5. Press `IMPORT` and select the configuration file
 
 #### No changes detected
 
-If the file to import does not contain changes compared to the current configuration, there are no actions to perform.
+If the file contains no changes compared to the current configuration, no action is required.
 
-The plugin will show a confirmation page similar to the following.
+The plugin shows a confirmation page similar to the following:
 ![](doc-assets/import-nochanges.png)
 
 #### Changes detected
 
-If the file to import contains changes compared to the current configuration, the plugin will provide a summary (similar to the following image) of all the changes and asks the user to confirm the action before implementing any change.
+If the file contains changes, the plugin shows a summary and asks you to confirm before applying them:
 ![](doc-assets/import-changes.png)
 
-The first lines will display details of:
-* the datasource selected as the destination of the import
-* the datasource in the file used as source of the changes to be imported
+The first lines show:
+* The datasource selected as the destination of the import
+* The source datasource recorded in the file
 
-> A *warning sign* is shown in case of *datasource name* mismatch, while a *source key* mismatch is considered a common scenario in the context of configuration promotion.
+> A *warning sign* appears if the *datasource names* do not match. A *source key* mismatch is common when promoting configurations.
 
-The table after shows the full list of changes that will be imported in the system after the confirmation:
-* Each line represent a type of configuration to be aligned; refer to the [Data Migration scope](#data-migration-scope) section for a detailed explanation of each item
-* The lines are sorted by their import sequence (i.e. all the changes in the first line will be imported before starting to import the second line etc.)
-* The other three columns contain only the count of objects impacted respectively by an `insert`, `updat` or `delate` action
-* It is possible to click on each number to get the full list of changes in JSON format for deeper analysis, each object contains information in the `newValue` or `oldValue` (updates actions have both data to allow comparisons)
+The table lists the changes to be applied after confirmation:
+* Each row represents a configuration type. See [Data Migration Scope](#data-migration-scope) for details.
+* Rows are sorted by import order; all changes in one row are applied before the next row.
+* The remaining columns show the number of objects affected by `insert`, `update`, and `delete` actions.
+* Click a number to inspect the changes in JSON format. Each change includes `newValue` or `oldValue`; updates include both for comparison.
 
-Once the review has been performed, it is possible to start the real import process by clicking on the `IMPORT` button.
-After confirming the extra 
+After reviewing the changes, click `IMPORT` and confirm the operation:
 ![](doc-assets/import-confirm.png)
 
 #### How to handle errors
 
-The plugin is fully relying on Linkurious Enterprise APIs for any export and import activities. The plugin is enforcing the right sequence of API call to resolve configuration dependencies and avoid errors due conflicting configurations.
+The plugin uses Linkurious Enterprise APIs for export and import. It orders API calls to resolve configuration dependencies and avoid conflicts.
 
-Despite those precautions, it may happen that some API call could fail in case of prerequisites not met or unexpected errors.
+An API call can still fail if a prerequisite is not met or an unexpected error occurs.
 
-In this particular situation the import process is aborted leaving the system in a partial update status. The plugin provides enough details about the failing action and the reason, helping the administrator to understand what are the actions that have been executed and what not. After taking the corrective actions it is possible to retry again the import that is not going to show anymore changes already synchronized.
+When this happens, the import is aborted and the system may be partially updated. The plugin reports the failing action and its reason. After correcting the problem, retry the import; changes that have already been synchronized will no longer appear.
 
-In case the sequence of actions bring the system in an unrecoverable status, or if the plugin makes changes to internal IDs causing different problems it will be necessary to restore the backup of the user-data store.
+If the system is left in an unrecoverable state, or changes to internal IDs cause problems, restore the user-data store backup.
 
 
-## Data Migration scope
+## Data Migration Scope
 
-The plugin scope is limited to Linkurious Enterprise configurations created within a specific datasource that are supposed to be reusable in the context of a promotion to a different instance.
+The plugin migrates datasource-specific Linkurious Enterprise configurations that can be reused on another instance.
 
-The above definition is excluding:
-* Any global configuration of the system which is not related to a single datasource (e.g. global authentication settings, global web server settings, etc.)
-* Any configuration related to the datasource definition (e.g. database connection string, index server configuration, etc.)
-* User's migration and any of their private objects (e.g. visualizations, private queries, etc.); the plugin takes into consideration only shared objects
+The following are outside its scope:
+* Global configuration unrelated to a specific datasource, such as authentication and web server settings
+* Datasource connection configuration, such as database connection strings and index server settings
+* Users and their private objects, such as visualizations and private queries
 
-> During the migration activities, the plugin cannot ensure the reuse of same internal IDs when creating new items. So the general assumption is that those IDs will be different and shouldn't be hardcoded any where.
+> New items may receive different internal IDs in the destination system. Do not hardcode these IDs.
+>
+> The plugin maps IDs used in security and sharing settings, but does not rewrite IDs in other content, such as queries or custom actions. Many resources are matched by UUID when comparing configurations.
 > 
-> The plugin is safely managing the mapping of IDs relative to security and sharing options, but is not performing any other data manipulation (e.g. in the contents of the Queries or Custom Actions).
+> If a shared object is made private in the source system, it is no longer exported. A subsequent import may delete the corresponding object from the destination when its service is enabled.
 
-Below the full list of configurations in scope:
-* **Schema Nodes** (service: `schema_nodes`): schema definitions for Node Categories and their properties (including visibility and type definition)
-  
-  > Physical deletions of those objects are not possible, any `delete` activity is implemented as change of visibility to none
-* **Schema Edges** (service: `schema_edges`): schema definitions for Edge Types and their properties (including visibility and type definition)
-  
-  > Physical deletions of those objects are not possible, any `delete` activity is implemented as change of visibility to none
-* **Datasource** (service: `datasource`): global datasource settings such as `Strict Schema` enabling, `Property Key Access Right` enabling, `Default Styles`, `Default Captions`, `Default Properties' order`
-  
-  > All the changes are foreseen as a single `update` activity.
-  > 
-  > `Default Styles` are represented by a single JSON object, any change to its content is seen as a single change of the whole JSON (there is no fine granularity changes tracking). The same concept applies to `Default Captions`.
-* **Custom Groups** (service: `custom_groups`, requires `datasource` and `schema_nodes` and `schema_edges`): custom groups and all their securities definition, built-in groups are excluded since automatically created by the system
-  
-  > IDs of custom groups will be different from the one in the source system: possible impact on automatic group mapping of groups with external systems (manual configuration out of scope of this plugin)
-* **Queries** (service: `queries`, requires `custom_groups`): not private Static Queries (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
-  
-  > If an existing Static Query is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
-* **Query with dynamic inputs** (service: `templates`, requires `custom_groups`, `tags`): not private Query with dynamic inputs (i.e. shared with everyone or specific groups); the sharing option will synchronized as well
-  
-  > If an existing Query with dynamic inputs is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
-* **Query Tags** (service: `tags`, requires the configuration of a *Service Account* with *Can create read-only queries and run queries* access rights): all query tags
-  > Queries that were assigned tags before the migration, will still have the same tags assigned after the migration.
-* **Custom Actions** (service: `custom_actions`, requires `custom_groups`): not private Custom Actions (i.e. shared with everyone)
-  
-  > If an existing Custom Action is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
+The following configurations are in scope:
+* **Schema Nodes** (service: `schema_nodes`): schema definitions for node categories and their properties, including visibility and types.
+
+  > These objects cannot be physically deleted. A `delete` action sets their visibility to none.
+* **Schema Edges** (service: `schema_edges`): schema definitions for edge types and their properties, including visibility and types.
+
+  > These objects cannot be physically deleted. A `delete` action sets their visibility to none.
+* **Datasource** (service: `datasource`): datasource settings such as `Strict Schema`, `Property Key Access Right`, `Default Styles`, `Default Captions`, and the default property order.
+
+  > All changes are represented as a single `update` action.
+  >
+  > `Default Styles` and `Default Captions` are each represented by a single JSON object. Any change to either is treated as a change to the whole object.
+* **Custom Groups** (service: `custom_groups`, requires `datasource`, `schema_nodes`, and `schema_edges`): custom groups and their access rights. Built-in groups are excluded because they are created by the system.
+
+  > Custom group IDs may differ from those in the source system, potentially affecting group mappings with external systems. Updating those mappings is outside the plugin's scope.
+* **Query Tags** (service: `tags`): query tags and their colors.
+  > Query tag assignments are synchronized by the query services.
+* **Queries** (service: `queries`, requires `custom_groups`, `schema_nodes`, `schema_edges`, and `tags`): shared static queries and their sharing settings.
+* **Queries with Dynamic Inputs** (service: `templates`, requires `custom_groups`, `schema_nodes`, `schema_edges`, and `tags`): shared queries with dynamic inputs and their sharing settings.
+* **Custom Actions** (service: `custom_actions`, requires `custom_groups`): shared custom actions and their sharing settings.
+* **Import Templates** (service: `import_templates`, requires `custom_groups`): shared import templates, including their type, entity configurations, CSV delimiter, and sharing settings.
 * **Alerts** (service: `alerts`, requires `custom_groups`): not private Alerts' definition, their models and their folder organization
-  
-  > Changes to alerts could cause the drop of results and their re-executions.
-  > 
-  > Changing the alert's title will trigger a sequence of `delete` and `insert` actions implying the lost of worked items. To keep the previous work, it is recommended to manually align the title before the synchronization to trigger only an `update` of the contents.
-  > 
-  > 
-  > Changing the model name of an alert will cause the delition of the old model and the creation of a new one causing a `(deleted)` message on the existing cases. To avoid the inconvenience, it is recommended to manually align the model names before the synchronization to trigger only an `update` of the contents.
-* **Spaces** (service: `spaces`, requires `custom_groups`)
-  
-  > Changing the space's title will trigger a sequence of `delete` and `insert` actions requiring the space being empty. To avoid an error during the synchronization, it is recommended to manually align the title before launching the process.
-  > 
-  > Removing non empty spaces is not possible, you will still be able to complete the synchronization but you will receive an error at the end with still some spaces to delete.
-* **Node Grouping Rules** (service: `node_grouping_rules`, requires `schema_nodes`): definition of node grouping rules of the datasource
-  
-  > Since it's not possible to edit rules, users should manually delete a rule to recreate a new one with the same name. The plugin will perform the same actions in case differences are detected.
-  > 
-  > Due the deletion of an existing rule, existing visualizations using the deleted rule will show the nodes ungrouped after the synchronization.
+
+  > Deleting alerts, but not their models, deletes their cases.
+* **Spaces** (service: `spaces`, requires `custom_groups`): spaces and their sharing settings.
+
+  > Non-empty spaces cannot be deleted. They are skipped during import, and the final comparison reports the remaining differences.
+* **Node Grouping Rules** (service: `node_grouping_rules`, requires `schema_nodes`): supported node grouping rule definitions for the datasource.
+
+  > Rules based on adjacent edge type are skipped. When a supported rule changes, the plugin deletes and recreates it because the update API is unavailable. Existing visualizations that use the deleted rule will show ungrouped nodes after synchronization.
 
 ## Audit Trail
 
-To mitigate the risks of using a [*Service Account*](#service-account-recommendations) and to provide additional support material in case of problems during the export / import,
-the plugin logs all the actions and their results adding the information of the real user connected to the system.
-It is possible to access those logs from the following folder `<linkurious>/data/logs/plugins/config-migration.log` (the file name could be different in case of a plugin configuration different from the one proposed in this document).
-
-To ensure the best traceability of actions, it is recommended to embed the service accounts credentials in the plugin configurations and let the system administrators connect with their own accounts.
-
+The plugin logs import actions and errors, including the connected user, to help investigate problems. Logs are available at `<linkurious>/data/logs/plugins/config-migration.log`; the filename may differ depending on the plugin configuration.
 
 ## Limitations
 
-* Due security restrictions, an `Application Key` cannot be used to perform all the migration activities requiring to specify an admin account
-* Due security restrictions, all the activities has to be performed through a *Service Account*: the export is limited to objet accessible to this account and the import is limited to objects owned by this account
-* Due security restrictions the *Service Account* cannot be associated to multiple built-in groups, so it is required to share configurations with custom groups instead of built-in one
-* Export and Import activities can be done only on datasources in the `ready` status
-* Due the identification of internal objects through incremental numbers, the synchronization of objects between `source` and `destination` is done through their names: this imply that changes to objects' names are tracked as a sequence of `delete` and `insert` actions instead of a single `update`
-* Due some internal logic, some updates may not be applied even if the API is not retouring an error (you will receive a dedicated error message telling this). A typical scenario is due configuration mistmatches between source and destination e.g. you have a numeric property indexed on a datasource configured with ElasticSearch but you try to import this configuration on a different datasource configured with Neo4j (which doesn't support index for numeric properties).
-* It is not possible to delete spaces that are not empty.
+* Export and import can be performed only on datasources in the `ready` state.
+* Some updates may not be applied even when the API returns no error. The plugin reports this after comparing the configurations again. For example, a numeric property indexed on a datasource using Elasticsearch may not be supported on a destination using Neo4j Search.
+* Non-empty spaces cannot be deleted.
 
 
 ## Available Custom APIs
 
 ### Export
-Export the current configuration of the server.
+Export the current configuration of a datasource.
 * HTTP Verb: `GET`
 * API Endpoint: `/api/export/:datasource?download=false`
 * URL Parameters:
-  * `datasource` (mandatory) \[string\]: the key of an active datasource from which export the configurations
-  * `download` (optional) \[bool\]: set to true to trigger file download without extra overhead (useful when called from a browser)
-* Returns a JSON object with the `config` attribute containing the configuration
+  * `datasource` (mandatory) \[string\]: the key of a ready datasource to export
+  * `download` (optional) \[bool\]: set to `true` to download the configuration directly
+* Returns a JSON object with the configuration in `config`, or the configuration itself when `download=true`
 
 ### Compare
-Perform the comparison between two configurations.
+Compare two configurations.
 * HTTP Verb: `POST`
 * API Endpoint: `/api/compare/:datasource`
 * URL Parameters:
-  * `datasource` (mandatory) \[string\]: the key of an active datasource from which export the configurations, use `00000000` in case the old configuration is passed in the body
-* Body: a JSON object containing
-  * `old` (optional) \[object\]: an exported configuration to be used as reference for the comparison, the current datasource configuration is used when not passed
-  * `new` (mandatory) \[object\]: an exported configuration that represents the desired final configuration
-* Returns a JSON object with the `diffs` attribute containing an array of JSON objects representing all the changes needed to make the `old` configuration equal to the `new` one
+  * `datasource` (mandatory) \[string\]: the key of a ready datasource to compare against; use `00000000` when supplying `old` in the body
+* Body: a JSON object containing:
+  * `old` (optional) \[object\]: the exported reference configuration; defaults to the current datasource configuration
+  * `new` (mandatory) \[object\]: the exported configuration representing the desired state
+* Returns a JSON object whose `diffs` attribute contains the changes needed to align `old` with `new` for the enabled services
 
 ### Import
 * HTTP Verb: `PATCH`
 * API Endpoint: `/api/import/:datasource`
 * URL Parameters:
-  * `datasource` (mandatory) \[string\]: the key of an active datasource into which apply changes
-* Body: an array of JSON objects representing all the changes to apply (compatible with the results of the [compare](#compare) API)
+  * `datasource` (mandatory) \[string\]: the key of the destination datasource
+* Body: an array of changes to apply, compatible with the results of the [compare](#compare) API
 * Returns a confirmation JSON object
