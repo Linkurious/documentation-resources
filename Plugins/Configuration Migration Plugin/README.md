@@ -190,6 +190,9 @@ Below the full list of configurations in scope:
 * **Custom Actions** (service: `custom_actions`, requires `custom_groups`): not private Custom Actions (i.e. shared with everyone)
 
   > If an existing Custom Action is unshared in the source system, it will not be in the export file anymore. A successive import of will mark this change as a `delete` action and delete the item from the `destination` system.
+* **Import Templates** (service: `import_templates`, requires `custom_groups`): shared import templates, including their type, entity configurations, CSV delimiter, and sharing settings.
+
+  > If an import template is made private in the source system, it will no longer be exported. A subsequent import will delete it from the destination system.
 * **Alerts** (service: `alerts`, requires `custom_groups`): not private Alerts' definition, their models and their folder organization
 
   > Deletion of alerts (not their models) will cause the drop of the cases.
