@@ -13,6 +13,7 @@ this document will provide you extra details of what you need to take care or do
 - [General major changes](#general-major-changes)
   - [Node.js v26](#nodejs-v26)
   - [Prometheus metrics replaced by OpenTelemetry](#prometheus-metrics-replaced-by-opentelemetry)
+  - [Plugin Manager and CSV Importer plugins removed](#plugin-manager-and-csv-importer-plugins-removed)
 
 # Requirements
 
@@ -91,3 +92,40 @@ no longer exist). Update your Prometheus alerts and Grafana dashboards according
 
 See the [Observability documentation](https://doc.linkurious.com/admin-manual/latest/observability/)
 for the full configuration and the list of available metrics.
+
+## Plugin Manager and CSV Importer plugins removed
+
+In Linkurious Enterprise v4.4, the deprecated `plugin-manager` and `csv-importer` plugins are no longer
+distributed. Both are replaced by built-in features:
+
+| Removed plugin   | Built-in replacement                                                                           |
+| ---------------- | ---------------------------------------------------------------------------------------------- |
+| `plugin-manager` | The `Admin -> Plugins manager` page                                                            |
+| `csv-importer`   | [CSV import](https://doc.linkurious.com/admin-manual/latest/import-csv/) with import templates |
+
+**_Impacted clients:_**
+
+- Clients using the Plugin Manager plugin. It was installed by default.
+- Clients using the CSV Importer plugin.
+- Clients listing `plugin-manager` or `csv-importer` in the `LKE_PLUGINS` environment variable.
+
+**_Benefits:_**
+
+The built-in features are maintained and released with Linkurious Enterprise, with no separate plugin to install or update.
+
+**_Impacts:_**
+
+`plugin-manager` is no longer part of the default `LKE_PLUGINS` value, and neither plugin can be installed
+through `LKE_PLUGINS` anymore.
+
+Plugins already installed are not removed by the update: their files stay in `<linkurious>/data/plugins`
+and they keep running. To remove them:
+
+1. Delete the `lke-plugin-plugin-manager-*.lke` and `lke-plugin-csv-importer-*.lke` files from
+   `<linkurious>/data/plugins`.
+2. Optionally, remove the `plugin-manager` and `csv-importer` entries from the `Plugins settings` field
+   in `Admin -> Global configuration`. Settings of a removed plugin are ignored.
+3. Remove `plugin-manager` and `csv-importer` from the `LKE_PLUGINS` environment variable, if set.
+
+Users of the CSV Importer plugin should create [CSV import templates](https://doc.linkurious.com/admin-manual/latest/import-csv/)
+to import their files.
