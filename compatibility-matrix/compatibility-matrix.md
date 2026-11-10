@@ -2,6 +2,8 @@
 
 ## Version compatibility matrix
 
+Third party product support cannot be guaranteed beyond their respective End of life.
+
 | Vendor \ Linkurious version| 4.0.7 - 4.0.15  | 4.0.16 - 4.0.x  |      4.1.x      |        4.2.x       |        4.3.x       |       4.4.x      |
 |:---------------------------|:---------------:|:---------------:|:---------------:|:------------------:|:------------------:|:----------------:|
 | [Neo4j][a]                 | 4.1.0 - 5.x[^1] | 4.1.0 - 5.x[^1] | 4.4.0 - 5.x[^1] | 4.4.0 - 2025.x[^1] | 4.4.0 - 2026.x[^1] | 5.x - 2026.x[^1] |
