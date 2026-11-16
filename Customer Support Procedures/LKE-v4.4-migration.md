@@ -14,6 +14,7 @@ this document will provide you extra details of what you need to take care or do
   - [Node.js v26](#nodejs-v26)
   - [Prometheus metrics replaced by OpenTelemetry](#prometheus-metrics-replaced-by-opentelemetry)
   - [Plugin Manager and CSV Importer plugins removed](#plugin-manager-and-csv-importer-plugins-removed)
+  - [Embedded Elasticsearch removed](#embedded-elasticsearch-removed)
 
 # Requirements
 
@@ -129,3 +130,31 @@ and they keep running. To remove them:
 
 Users of the CSV Importer plugin should create [CSV import templates](https://doc.linkurious.com/admin-manual/latest/import-csv/)
 to import their files.
+
+## Embedded Elasticsearch removed
+In Linkurious Enterprise v4.4, the embedded Elasticsearch runtime has been removed.
+
+**_Impacted clients:_**
+
+- Clients running any Linkurious Enterprise version except the Docker image without the `-es` suffix
+- Clients using the embedded Elasticsearch runtime
+
+**_Benefits:_**
+
+- Reduced size of the Linkurious Enterprise installation and Docker image.
+- Cleaner and independant update cycles for Linkurious Enterprise and Elasticsearch.
+
+**_Impacts:_**
+
+Embedded Elasticsearch is no longer an available search vendor option. Datasources configured with Embedded Elasticsearch now appear as regular Elasticsearch configuration with `host` `127.0.0.1` and `port` `9201`.
+
+To restore the datasource configuration, you can either:
+
+- Setup an external Elasticsearch server, see [how to configure it](https://doc.linkurious.com/admin-manual/latest/es-config/);
+- Use another search engine provided for your graph vendor, see [the search option comparison](https://doc.linkurious.com/admin-manual/latest/search-options/);
+- Disable search using the [No Search](https://doc.linkurious.com/admin-manual/latest/no-search/) option.
+
+Notes:
+- The data of the old embedded Elasticsearch at `<linkurious>/system/elasticsearch` is backed up during the update process. It can be safely removed to free up space as it is no longer used.
+- If you use Docker, replace the `linkurious-enterprise-es` image with `linkurious-enterprise`. The `/elasticsearch` volume is obsolete: only the `/data` volume is needed.
+
