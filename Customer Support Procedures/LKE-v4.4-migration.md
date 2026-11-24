@@ -12,6 +12,7 @@ this document will provide you extra details of what you need to take care or do
 - [Requirements](#requirements)
 - [General major changes](#general-major-changes)
   - [Node.js v26](#nodejs-v26)
+  - [Express 5 for plugins](#express-5-for-plugins)
   - [Prometheus metrics replaced by OpenTelemetry](#prometheus-metrics-replaced-by-opentelemetry)
   - [Plugin Manager and CSV Importer plugins removed](#plugin-manager-and-csv-importer-plugins-removed)
   - [Embedded Elasticsearch removed](#embedded-elasticsearch-removed)
@@ -59,6 +60,39 @@ check that they and their dependencies are compatible with Node.js v26 before up
 for breaking changes).
 
 The Docker image is not affected: it already ships with the right Node.js version.
+
+## Express 5 for plugins
+
+In Linkurious Enterprise v4.4, the web framework used by the server and by the plugin host has been updated
+from Express 4 to [Express 5](https://expressjs.com/en/guide/migrating-5.html).
+
+**_Impacted clients:_**
+
+- Clients using custom plugins that declare backend APIs (`backendFiles` in the plugin manifest).
+
+**_Benefits:_**
+
+- Up-to-date security fixes: Express 5 is the actively maintained release line, and Express 4 is reaching its end of life.
+
+**_Impacts:_**
+
+The router given to plugin backend files is created by Linkurious Enterprise. From v4.4 on, plugin routes run
+on Express 5, even if the plugin ships its own copy of Express 4. Code written for Express 4 may fail to start
+or behave differently. The main changes are:
+
+| Area                         | Express 4                                             | Express 5                                                    |
+| ---------------------------- | ----------------------------------------------------- | ------------------------------------------------------------ |
+| Wildcard routes              | `/files/*`                                            | `/files/*splat` (the plugin fails to start otherwise)        |
+| Optional route parameters    | `/items/:id?`                                         | `/items{/:id}` (the plugin fails to start otherwise)         |
+| Regular expressions in paths | `/user/:id(\d+)`                                      | Not supported (the plugin fails to start)                    |
+| Removed methods              | `req.param()`, `res.send(404)`, `res.json(obj, 500)`… | Error or wrong response when the route is called             |
+| Query strings                | `?ids[]=1&ids[]=2` parsed as an array                 | Not parsed as an array anymore: the plugin may misbehave     |
+| Request body                 | Empty object when there is no body                    | `undefined` with recent body parsers: the plugin may misbehave |
+
+Check your custom plugins for these changes. For more details, see the [Express 5 migration guide](https://expressjs.com/en/guide/migrating-5.html).
+
+A plugin with a legacy route syntax will build but fails to start. You will find a `PathError` in the
+logs. For example`PathError: Missing parameter name at index 8: /files/*`.
 
 ## Prometheus metrics replaced by OpenTelemetry
 

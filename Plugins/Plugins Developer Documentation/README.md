@@ -769,12 +769,12 @@ module.exports = function (options) {
 
 ### Router, Request and Response interface
 
-From the example above, notice that we use the object "options.router" to create new API endpoints for the plugin. "options.router" is a standard express.js Router object. The reference of this interface is available here: [https://expressjs.com/en/4x/api.html#router](https://expressjs.com/en/4x/api.html#router)
+From the example above, notice that we use the object "options.router" to create new API endpoints for the plugin. "options.router" is a standard express.js Router object. The reference of this interface is available here: [https://expressjs.com/en/5x/api.html#router](https://expressjs.com/en/5x/api.html#router)
 
 When creating handlers for API endpoints, notice that a handler always receives 2 parameters: "req" and "res". These two objects are standard "Request" and "Response" express.js objects. The contract of these interfaces is available here:
 
-- Request: [https://expressjs.com/en/4x/api.html#req](https://expressjs.com/en/4x/api.html#req)
-- Response: [https://expressjs.com/en/4x/api.html#res](https://expressjs.com/en/4x/api.html#res)
+- Request: [https://expressjs.com/en/5x/api.html#req](https://expressjs.com/en/5x/api.html#req)
+- Response: [https://expressjs.com/en/5x/api.html#res](https://expressjs.com/en/5x/api.html#res)
 
 ### Interface of "options"
 
