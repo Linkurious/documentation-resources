@@ -35,7 +35,6 @@ The plugin manifest specifies a minimum Linkurious Enterprise version. The plugi
 
 ### Prerequisites
 
-* Linkurious Enterprise v4.3.13+
 * A connected datasource in Linkurious Enterprise
 
 
