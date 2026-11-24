@@ -9,3 +9,4 @@
 | 2023-04-06     | Non-Docker builds | None        | [LK-SEC-2023-1](LK-SEC-2023-1.md)  | Low            | SnakeYAML related    |
 | 2026-10-21     | v4.3.13 and older | v4.3.14     | [LK-SEC-2026-1](LK-SEC-2026-1.md)  | High           | Node.js Brotli       |
 | 2026-10-21     | v4.3.13 and older | v4.3.14     | [LK-SEC-2026-2](LK-SEC-2026-2.md)  | High           | eMudhra certificates |
+| 2026-11-13     | v4.3.15 and older | v4.3.16     | [LK-SEC-2026-3](LK-SEC-2026-3.md)  | High           | HTTPS/TLS related    |

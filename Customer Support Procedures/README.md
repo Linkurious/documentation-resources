@@ -20,6 +20,7 @@ The documentation listed will guide you through critical updating procedures and
 * If you need to upgrade to Linkurious Enterprise v4.0, please read [this](LKE-v4.0-migration.md)
 * If you need to upgrade to Linkurious Enterprise v4.1, please read [this](LKE-v4.1-migration.md)
 * If you need to upgrade to Linkurious Enterprise v4.2, please read [this](LKE-v4.2-migration.md)
+* If you need to upgrade to Linkurious Enterprise v4.4, please read [this](LKE-v4.4-migration.md)
 
 ## Neo4j
 

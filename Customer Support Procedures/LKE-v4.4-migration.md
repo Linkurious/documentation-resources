@@ -1,0 +1,160 @@
+<!-- omit in toc -->
+
+# Linkurious Enterprise migration to v4.4 guidelines
+
+If you are planning to migrate your Linkurious Enterprise instance from an older version to v4.4,
+this document will provide you extra details of what you need to take care or do for a successful upgrade.
+
+<!-- omit in toc -->
+
+# Table of contents
+
+- [Requirements](#requirements)
+- [General major changes](#general-major-changes)
+  - [Node.js v26](#nodejs-v26)
+  - [Prometheus metrics replaced by OpenTelemetry](#prometheus-metrics-replaced-by-opentelemetry)
+  - [Plugin Manager and CSV Importer plugins removed](#plugin-manager-and-csv-importer-plugins-removed)
+  - [Embedded Elasticsearch removed](#embedded-elasticsearch-removed)
+
+# Requirements
+
+If you are updating from Linkurious Enterprise v4.1 or older, please also read the
+[v4.2 migration guidelines](LKE-v4.2-migration.md) before updating.
+
+Linkurious Enterprise v4.4 runs on Node.js v26. Before updating, check that your operating system
+is still supported (see [Node.js v26](#nodejs-v26)).
+
+We strongly recommend backing-up your SQL database and your installation folder before updating Linkurious Enterprise.
+
+# General major changes
+
+## Node.js v26
+
+In Linkurious Enterprise v4.4, the embedded Node.js runtime has been updated to v26.
+
+**_Impacted clients:_**
+
+- Clients running Linkurious Enterprise on macOS older than 13.5.
+- Clients using custom plugins.
+
+**_Benefits:_**
+
+Up-to-date security fixes and performance improvements from the latest Node.js release.
+
+**_Impacts:_**
+
+Node.js v26 has the following [platform requirements](https://github.com/nodejs/node/blob/v26.x/BUILDING.md#platform-list):
+
+| Operating system | Minimum version                              |
+| ---------------- | -------------------------------------------- |
+| Linux            | kernel >= 4.18 and glibc >= 2.28 (unchanged) |
+| Windows          | Windows 10 / Windows Server 2016 (unchanged) |
+| macOS            | 13.5 (Ventura)                               |
+
+If your server runs macOS older than 13.5, upgrade the operating system before updating Linkurious Enterprise.
+
+Plugins run on the Node.js runtime embedded in Linkurious Enterprise. If you use custom plugins,
+check that they and their dependencies are compatible with Node.js v26 before updating
+(see the [Node.js changelog](https://github.com/nodejs/node/blob/main/doc/changelogs/CHANGELOG_V26.md)
+for breaking changes).
+
+The Docker image is not affected: it already ships with the right Node.js version.
+
+## Prometheus metrics replaced by OpenTelemetry
+
+In Linkurious Enterprise v4.4, the legacy Prometheus metrics exporter has been removed and replaced by
+[OpenTelemetry](https://opentelemetry.io), the open standard for observability.
+
+**_Impacted clients:_**
+
+Clients who enabled metrics with the `metrics` key of the configuration file (`metrics.enabled: true`).
+
+**_Benefits:_**
+
+- Vendor-neutral telemetry: metrics can be scraped by Prometheus or pushed to any OpenTelemetry-compatible backend.
+- New Linkurious Enterprise-specific metrics, such as graph query duration and data-source state.
+- Distributed tracing, with trace identifiers added to Linkurious Enterprise logs.
+
+**_Impacts:_**
+
+The `metrics` configuration key is now removed: with no further action, metrics are no longer exposed after the update.
+
+To restore them:
+
+1. Set the `LKE_OTEL_ENABLED=true` environment variable. OpenTelemetry is configured through environment
+   variables only, not through the configuration file.
+2. If you are not using Docker, also set `OTEL_METRICS_EXPORTER=prometheus` and `OTEL_EXPORTER_PROMETHEUS_PORT=9400`
+   to keep exposing metrics on the same `/metrics` endpoint and port as before.
+   The Docker image already uses these defaults.
+3. If you do not run an OpenTelemetry (OTLP) collector, set `OTEL_TRACES_EXPORTER=none` to disable trace export.
+
+Most metric names have changed (for example, `nodejs_eventloop_lag_seconds` and `http_request_duration_seconds`
+no longer exist). Update your Prometheus alerts and Grafana dashboards accordingly.
+
+See the [Observability documentation](https://doc.linkurious.com/admin-manual/latest/observability/)
+for the full configuration and the list of available metrics.
+
+## Plugin Manager and CSV Importer plugins removed
+
+In Linkurious Enterprise v4.4, the deprecated `plugin-manager` and `csv-importer` plugins are no longer
+distributed. Both are replaced by built-in features:
+
+| Removed plugin   | Built-in replacement                                                                           |
+| ---------------- | ---------------------------------------------------------------------------------------------- |
+| `plugin-manager` | The `Admin -> Plugins manager` page                                                            |
+| `csv-importer`   | [CSV import](https://doc.linkurious.com/admin-manual/latest/import-csv/) with import templates |
+
+**_Impacted clients:_**
+
+- Clients using the Plugin Manager plugin. It was installed by default.
+- Clients using the CSV Importer plugin.
+- Clients listing `plugin-manager` or `csv-importer` in the `LKE_PLUGINS` environment variable.
+
+**_Benefits:_**
+
+The built-in features are maintained and released with Linkurious Enterprise, with no separate plugin to install or update.
+
+**_Impacts:_**
+
+`plugin-manager` is no longer part of the default `LKE_PLUGINS` value, and neither plugin can be installed
+through `LKE_PLUGINS` anymore.
+
+Plugins already installed are not removed by the update: their files stay in `<linkurious>/data/plugins`
+and they keep running. To remove them:
+
+1. Delete the `lke-plugin-plugin-manager-*.lke` and `lke-plugin-csv-importer-*.lke` files from
+   `<linkurious>/data/plugins`.
+2. Optionally, remove the `plugin-manager` and `csv-importer` entries from the `Plugins settings` field
+   in `Admin -> Global configuration`. Settings of a removed plugin are ignored.
+3. Remove `plugin-manager` and `csv-importer` from the `LKE_PLUGINS` environment variable, if set.
+
+Users of the CSV Importer plugin should create [CSV import templates](https://doc.linkurious.com/admin-manual/latest/import-csv/)
+to import their files.
+
+## Embedded Elasticsearch removed
+In Linkurious Enterprise v4.4, the embedded Elasticsearch runtime has been removed.
+
+**_Impacted clients:_**
+
+- Clients running any Linkurious Enterprise version except the Docker image without the `-es` suffix
+- Clients using the embedded Elasticsearch runtime
+
+**_Benefits:_**
+
+- Reduced size of the Linkurious Enterprise installation and Docker image.
+- Cleaner and independant update cycles for Linkurious Enterprise and Elasticsearch.
+
+**_Impacts:_**
+
+Embedded Elasticsearch is no longer an available search vendor option. Datasources configured with Embedded Elasticsearch now appear as regular Elasticsearch configuration with `host` `127.0.0.1` and `port` `9201`.
+
+To restore the datasource configuration, you can either:
+
+- Setup an external Elasticsearch server, see [how to configure it](https://doc.linkurious.com/admin-manual/latest/es-config/);
+- Use another search engine provided for your graph vendor, see [the search option comparison](https://doc.linkurious.com/admin-manual/latest/search-options/);
+- Disable search using the [No Search](https://doc.linkurious.com/admin-manual/latest/no-search/) option.
+
+Notes:
+- The data of the old embedded Elasticsearch at `<linkurious>/system/elasticsearch` is backed up during the update process. It can be safely removed to free up space as it is no longer used.
+- If you use Docker, replace the `linkurious-enterprise-es` image with `linkurious-enterprise`. The `/elasticsearch` volume is obsolete: only the `/data` volume is needed.
+
