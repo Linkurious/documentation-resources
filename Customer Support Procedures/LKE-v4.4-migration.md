@@ -18,6 +18,7 @@ this document will provide you extra details of what you need to take care or do
   - [Neo4j 4.4 no longer supported](#neo4j-44-no-longer-supported)
   - [Memgraph 2.x no longer supported](#memgraph-2x-no-longer-supported)
   - [Embedded Elasticsearch removed](#embedded-elasticsearch-removed)
+  - [Older browsers no longer supported](#older-browsers-no-longer-supported)
 
 # Requirements
 
@@ -242,3 +243,27 @@ To restore the datasource configuration, you can either:
 Notes:
 - The data of the old embedded Elasticsearch at `<linkurious>/system/elasticsearch` is backed up during the update process. It can be safely removed to free up space as it is no longer used.
 - If you use Docker, replace the `linkurious-enterprise-es` image with `linkurious-enterprise`. The `/elasticsearch` volume is obsolete: only the `/data` volume is needed.
+
+## Older browsers no longer supported
+
+In Linkurious Enterprise v4.4, support for browsers released more than 2 years ago has been removed.
+
+**_Impacted clients:_**
+
+- Clients whose users access Linkurious Enterprise with an older browser version than the ones listed below.
+
+**_Benefits:_**
+
+- Up-to-date security fixes from the browser vendors.
+
+**_Impacts:_**
+
+The following browser versions are now the oldest supported versions:
+
+| Browser | Oldest supported version |
+| ------- | ------------------------ |
+| Chrome  | 131                      |
+| Edge    | 131                      |
+| Firefox | 133                      |
+
+Older versions of these browsers are no longer guaranteed to work. Make sure that your users' browsers are up to date before updating Linkurious Enterprise.
