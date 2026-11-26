@@ -26,8 +26,8 @@ If you are updating from Linkurious Enterprise v4.1 or older, please also read t
 Linkurious Enterprise v4.4 runs on Node.js v26. Before updating, check that your operating system
 is still supported (see [Node.js v26](#nodejs-v26)).
 
-Linkurious Enterprise v4.4 supports Neo4j 5 or newer. If you use Neo4j 4.4 or older, plan to upgrade it
-(see [Neo4j 4.4 no longer supported](#neo4j-44-no-longer-supported)).
+Linkurious Enterprise v4.4 supports Neo4j 5 or newer versions that are not end-of-life.
+If you use Neo4j 4.4 or older, plan to upgrade it (see [Neo4j 4.4 no longer supported](#neo4j-44-no-longer-supported)).
 
 We strongly recommend backing-up your SQL database and your installation folder before updating Linkurious Enterprise.
 
@@ -184,7 +184,13 @@ In Linkurious Enterprise v4.4, support for Neo4j 4.4 and older has ended. The lo
 **_Impacts:_**
 
 Neo4j 4.4 and older are end-of-life and are no longer supported:
-deployments running Neo4j 4 must update to Neo4j 5 or newer. In general, end-of-life Neo4j versions are not supported.
+deployments running Neo4j 4 must update to Neo4j 5 or newer versions that are not end-of-life.
+In general, end-of-life Neo4j versions are not supported.
+
+Since 2025, Neo4j has used calendar versioning, with a new release every month (`2025.01`, `2025.02`, …).
+Each calendar release reaches end-of-life soon after the next one is out, while Neo4j 5.26, the last 5.x release,
+is a long-term support (LTS) release. In practice, a supported deployment runs either Neo4j 5.26 LTS
+or a recent calendar release (see the [Neo4j end-of-life dates](https://endoflife.date/neo4j)).
 
 See the [Neo4j upgrade and migration guide](https://neo4j.com/docs/upgrade-migration-guide/current/).
 
