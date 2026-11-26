@@ -15,6 +15,7 @@ this document will provide you extra details of what you need to take care or do
   - [Express 5 for plugins](#express-5-for-plugins)
   - [Prometheus metrics replaced by OpenTelemetry](#prometheus-metrics-replaced-by-opentelemetry)
   - [Plugin Manager and CSV Importer plugins removed](#plugin-manager-and-csv-importer-plugins-removed)
+  - [Neo4j 4.4 no longer supported](#neo4j-44-no-longer-supported)
   - [Embedded Elasticsearch removed](#embedded-elasticsearch-removed)
 
 # Requirements
@@ -24,6 +25,9 @@ If you are updating from Linkurious Enterprise v4.1 or older, please also read t
 
 Linkurious Enterprise v4.4 runs on Node.js v26. Before updating, check that your operating system
 is still supported (see [Node.js v26](#nodejs-v26)).
+
+Linkurious Enterprise v4.4 supports Neo4j 5 or newer versions that are not end-of-life.
+If you use Neo4j 4.4 or older, plan to upgrade it (see [Neo4j 4.4 no longer supported](#neo4j-44-no-longer-supported)).
 
 We strongly recommend backing-up your SQL database and your installation folder before updating Linkurious Enterprise.
 
@@ -165,6 +169,31 @@ and they keep running. To remove them:
 Users of the CSV Importer plugin should create [CSV import templates](https://doc.linkurious.com/admin-manual/latest/import-csv/)
 to import their files.
 
+## Neo4j 4.4 no longer supported
+
+In Linkurious Enterprise v4.4, support for Neo4j 4.4 and older has ended. The lowest supported Neo4j version is now v5.
+
+**_Impacted clients:_**
+
+- Clients with a Neo4j 4.4 (or older) data source.
+
+**_Benefits:_**
+
+- Supported Neo4j versions are maintained and receive security fixes from Neo4j.
+
+**_Impacts:_**
+
+Neo4j 4.4 and older are end-of-life and are no longer supported:
+deployments running Neo4j 4 must update to Neo4j 5 or newer versions that are not end-of-life.
+In general, end-of-life Neo4j versions are not supported.
+
+Since 2025, Neo4j has used calendar versioning, with a new release every month (`2025.01`, `2025.02`, …).
+Each calendar release reaches end-of-life soon after the next one is out, while Neo4j 5.26, the last 5.x release,
+is a long-term support (LTS) release. In practice, a supported deployment runs either Neo4j 5.26 LTS
+or a recent calendar release (see the [Neo4j end-of-life dates](https://endoflife.date/neo4j)).
+
+See the [Neo4j upgrade and migration guide](https://neo4j.com/docs/upgrade-migration-guide/current/).
+
 ## Embedded Elasticsearch removed
 In Linkurious Enterprise v4.4, the embedded Elasticsearch runtime has been removed.
 
@@ -191,4 +220,3 @@ To restore the datasource configuration, you can either:
 Notes:
 - The data of the old embedded Elasticsearch at `<linkurious>/system/elasticsearch` is backed up during the update process. It can be safely removed to free up space as it is no longer used.
 - If you use Docker, replace the `linkurious-enterprise-es` image with `linkurious-enterprise`. The `/elasticsearch` volume is obsolete: only the `/data` volume is needed.
-
