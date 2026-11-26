@@ -10,7 +10,7 @@ Third party product support cannot be guaranteed beyond their respective End of 
 | [Neo4 Aura][b]             |       Yes       |       Yes       |       Yes       |         Yes        |         Yes        |        Yes       |
 | [Elasticsearch][c]         |    7.0 - 8.x    |    7.0 - 8.x    |    7.0 - 8.x    |      7.0 - 8.x     |      8.0 - 9.x     |     8.0 - 9.x    |
 | [Azure Cosmos DB][d]       |      Yes        |       Yes       |       Yes       |         Yes        |         Yes        |        Yes       |
-| [Memgraph][e]              | 2.4 - 2.7[^2]   |  2.4 - 2.7[^2]  | 2.4 - 2.16[^2]  |    2.4 - 3.1[^2]   |    2.4 - 3.6[^2]   |   2.4 - 3.14[^2] |
+| [Memgraph][e]              | 2.4 - 2.7[^2]   |  2.4 - 2.7[^2]  | 2.4 - 2.16[^2]  |    2.4 - 3.1[^2]   |    2.4 - 3.6[^2]   |   3.0 - 3.14[^2] |
 | [Amazon Neptune][f]        |   1.2.0[^2]     |    1.2.0[^2]    |    1.3.0[^2]    |      1.3.0[^2]     |      1.3.4[^2]     |     1.3.4[^2]    |
 | [Google Spanner Graph][g]  |       No        |       No        |     No[^3]      |         Yes        |         Yes        |        Yes       |
 | [Google BigQuery Graph][h] |       No        |       No        |       No        |         No         |        Yes[^4]     |        Yes       |
