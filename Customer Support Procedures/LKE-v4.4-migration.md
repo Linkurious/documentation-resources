@@ -16,6 +16,7 @@ this document will provide you extra details of what you need to take care or do
   - [Prometheus metrics replaced by OpenTelemetry](#prometheus-metrics-replaced-by-opentelemetry)
   - [Plugin Manager and CSV Importer plugins removed](#plugin-manager-and-csv-importer-plugins-removed)
   - [Neo4j 4.4 no longer supported](#neo4j-44-no-longer-supported)
+  - [Memgraph 2.x no longer supported](#memgraph-2x-no-longer-supported)
   - [Embedded Elasticsearch removed](#embedded-elasticsearch-removed)
 
 # Requirements
@@ -28,6 +29,9 @@ is still supported (see [Node.js v26](#nodejs-v26)).
 
 Linkurious Enterprise v4.4 supports Neo4j 5 or newer versions that are not end-of-life.
 If you use Neo4j 4.4 or older, plan to upgrade it (see [Neo4j 4.4 no longer supported](#neo4j-44-no-longer-supported)).
+
+Linkurious Enterprise v4.4 supports Memgraph 3.0 or newer. If you use Memgraph 2.x, plan to upgrade it
+(see [Memgraph 2.x no longer supported](#memgraph-2x-no-longer-supported)).
 
 We strongly recommend backing-up your SQL database and your installation folder before updating Linkurious Enterprise.
 
@@ -193,6 +197,24 @@ is a long-term support (LTS) release. In practice, a supported deployment runs e
 or a recent calendar release (see the [Neo4j end-of-life dates](https://endoflife.date/neo4j)).
 
 See the [Neo4j upgrade and migration guide](https://neo4j.com/docs/upgrade-migration-guide/current/).
+
+## Memgraph 2.x no longer supported
+
+In Linkurious Enterprise v4.4, support for Memgraph 2.x has ended. The lowest supported Memgraph version is now v3.0.0.
+
+**_Impacted clients:_**
+
+- Clients with a Memgraph 2.x data source.
+
+**_Benefits:_**
+
+- Supported Memgraph versions are maintained and receive security fixes from Memgraph.
+
+**_Impacts:_**
+
+Memgraph 2.x is no longer supported: deployments running Memgraph 2.x must update to Memgraph 3.0.0 or newer.
+
+See the [Memgraph upgrade guide](https://memgraph.com/docs/database-management/upgrades).
 
 ## Embedded Elasticsearch removed
 In Linkurious Enterprise v4.4, the embedded Elasticsearch runtime has been removed.
